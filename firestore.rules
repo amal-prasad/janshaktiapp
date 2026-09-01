@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isAdmin() {
+      return signedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Accounts are created by the seed script only. Nobody self-registers or
+    // self-promotes; a user may read their own profile and nothing else.
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow write: if false;
+    }
+
+    match /editions/{editionId} {
+      allow read, create, update: if signedIn();
+      allow delete: if isAdmin();
+
+      match /pages/{pageId} {
+        allow read, write: if signedIn();
+      }
+    }
+  }
+}

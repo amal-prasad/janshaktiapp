@@ -1,0 +1,22 @@
+{
+  "name": "epaper-render",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file=.env src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "playwright": "^1.56.0",
+    "express": "^5.1.0",
+    "firebase-admin": "^13.5.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/express": "^5.0.0",
+    "@types/node": "^24.7.0",
+    "tsx": "^4.20.6"
+  }
+}

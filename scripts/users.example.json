@@ -1,0 +1,4 @@
+[
+  { "email": "editor1@example.com", "password": "changeme123", "name": "संपादक एक", "role": "editor" },
+  { "email": "admin@example.com", "password": "changeme123", "name": "व्यवस्थापक", "role": "admin" }
+]

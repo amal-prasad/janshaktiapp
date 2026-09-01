@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+:root {
+  --font-hi: var(--font-noto-dev), system-ui, sans-serif;
+}
+
+html,
+body {
+  font-family: var(--font-hi);
+}
+
+/* Editor canvas scales a true-size page down. Padding/box-sizing mirror the
+   .print-sheet in app/print/[id]/page.tsx so the canvas is WYSIWYG. */
+.page-sheet {
+  background: #fff;
+  color: #000;
+  width: var(--page-w);
+  height: var(--page-h);
+  padding: 12.7mm;
+  box-sizing: border-box;
+  overflow: hidden;
+}
