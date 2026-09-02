@@ -17,8 +17,6 @@ export default function ImagePicker({ editionId, image, onChange, placedMm }: Pr
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const imgWrapRef = useRef<HTMLDivElement>(null);
-  const draggingRef = useRef(false);
 
   const handleFile = async (file: File | undefined) => {
     if (!file) return;
@@ -33,16 +31,6 @@ export default function ImagePicker({ editionId, image, onChange, placedMm }: Pr
       setBusy(false);
       if (inputRef.current) inputRef.current.value = "";
     }
-  };
-
-  const setFocalFromEvent = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!image) return;
-    const el = imgWrapRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
-    const y = Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height));
-    onChange({ ...image, focalX: x, focalY: y });
   };
 
   const verdict = image ? checkImage(image.naturalW, placedMm) : null;
@@ -77,38 +65,6 @@ export default function ImagePicker({ editionId, image, onChange, placedMm }: Pr
 
       {image && (
         <>
-          <div
-            ref={imgWrapRef}
-            className="relative mt-2 cursor-crosshair select-none"
-            style={{ touchAction: "none" }}
-            onPointerDown={(e) => {
-              draggingRef.current = true;
-              setFocalFromEvent(e);
-            }}
-            onPointerMove={(e) => {
-              if (draggingRef.current) setFocalFromEvent(e);
-            }}
-            onPointerUp={() => {
-              draggingRef.current = false;
-            }}
-            onPointerLeave={() => {
-              draggingRef.current = false;
-            }}
-          >
-            <img src={image.url} alt="" className="block w-full" draggable={false} />
-            <div
-              className="pointer-events-none absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow"
-              style={{
-                left: `${image.focalX * 100}%`,
-                top: `${image.focalY * 100}%`,
-                background: "rgba(37,99,235,0.8)",
-              }}
-            />
-          </div>
-          <div className="mt-1 text-xs text-gray-500">
-            फ़ोटो पर क्लिक/ड्रैग करके फ़ोकस बिंदु सेट करें
-          </div>
-
           <input
             type="text"
             value={image.caption ?? ""}

@@ -95,9 +95,44 @@ const BoxedMinimal = ({ fields, color, logoUrl }: SlotRenderProps) => (
   </div>
 );
 
+const janshaktiFields = [
+  ...commonFields,
+  { key: "leftBox1", label: "बायाँ बॉक्स - पंक्ति 1", default: "वर्ष 12 · अंक 245" },
+  { key: "leftBox2", label: "बायाँ बॉक्स - पंक्ति 2", default: "रायपुर संस्करण" },
+  { key: "rightBox1", label: "दायाँ बॉक्स - पंक्ति 1", default: "मूल्य ₹ 5.00" },
+  { key: "rightBox2", label: "दायाँ बॉक्स - पंक्ति 2", default: "RNI No. CHHHIN/2014/57145" },
+];
+
+/** Three-column masthead: bordered info box left, logo/name/tagline centred, mirrored box right. */
+const Janshakti = ({ fields, color, logoUrl }: SlotRenderProps) => (
+  <div style={{ width: "100%", fontFamily: "serif", color: "#111" }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "3mm", padding: "1.5mm 1mm" }}>
+      <div style={{ border: `1pt solid ${color}`, padding: "1mm 2.5mm", fontSize: "0.7em", lineHeight: 1.3, textAlign: "center" }}>
+        <div>{fields.leftBox1}</div>
+        <div>{fields.leftBox2}</div>
+      </div>
+      <div style={{ textAlign: "center", flex: 1 }}>
+        <Logo logoUrl={logoUrl} name={fields.newspaperName} />
+        {!logoUrl && (
+          <h1 style={{ fontSize: "3.2em", fontWeight: 900, letterSpacing: "0.02em", margin: 0, color }}>
+            {fields.newspaperName}
+          </h1>
+        )}
+        <div style={{ fontSize: "0.82em", fontStyle: "italic", margin: "0.5mm 0" }}>{fields.tagline}</div>
+      </div>
+      <div style={{ border: `1pt solid ${color}`, padding: "1mm 2.5mm", fontSize: "0.7em", lineHeight: 1.3, textAlign: "center" }}>
+        <div>{fields.rightBox1}</div>
+        <div>{fields.rightBox2}</div>
+      </div>
+    </div>
+    <div style={{ borderBottom: `2.2pt solid ${color}` }} />
+  </div>
+);
+
 export const headerTemplates: SlotTemplate[] = [
   { id: "classic", slot: "header", label: "क्लासिक केंद्रित", fields: commonFields, Render: Classic },
   { id: "split-band", slot: "header", label: "विभाजित पट्टी", fields: commonFields, Render: SplitBand },
   { id: "color-band", slot: "header", label: "रंगीन पट्टी", fields: commonFields, Render: ColorBand },
   { id: "boxed-minimal", slot: "header", label: "बॉक्स न्यूनतम", fields: commonFields, Render: BoxedMinimal },
+  { id: "janshakti", slot: "header", label: "जनशक्ति (लोगो + बॉक्स)", fields: janshaktiFields, Render: Janshakti },
 ];

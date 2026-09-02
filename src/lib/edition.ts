@@ -21,16 +21,26 @@ export const blankPage = (index: number): Omit<PageDoc, "id"> => ({
 export async function createEdition(uid: string, title: string, date: string): Promise<string> {
   const now = Date.now();
   const ref = await addDoc(editionsCol(), {
-    title, date, pageCount: 1, createdBy: uid, createdAt: now, updatedAt: now,
+    title, date, pageCount: 8, createdBy: uid, createdAt: now, updatedAt: now,
     pageSizeMm: DEFAULT_PAGE_SIZE,
     slots: {
-      header: emptySlot("classic"),
+      header: emptySlot("janshakti"),
       header2: emptySlot("strip", false),
-      subheader: emptySlot("tagline", false),
+      subheader: { ...emptySlot("date-strip", true), color: "#0b4a8f" },
       footer: emptySlot("simple"),
     },
   } satisfies Omit<EditionDoc, "id">);
-  await setDoc(doc(pagesCol(ref.id), newId()), blankPage(0));
+  const batch = writeBatch(db);
+  for (let i = 0; i < 8; i++) {
+    const page = i === 1 || i === 6
+      ? {
+          ...blankPage(i),
+          rows: [{ id: newId(), cols: [{ id: newId(), span: 12, blocks: [{ id: newId(), type: "ad" as const, heightMm: 430 }] }] }],
+        }
+      : blankPage(i);
+    batch.set(doc(pagesCol(ref.id), newId()), page);
+  }
+  await batch.commit();
   return ref.id;
 }
 

@@ -20,35 +20,28 @@ function Render({ block, editing, onChange }: BlockRenderProps<AdBlock>) {
     />
   ) : null;
 
-  if (block.image) {
-    // While editing, ImagePicker already shows this photo in its own
-    // focal-point preview -- rendering it again here duplicated every
-    // uploaded photo on the canvas.
-    if (editing) {
-      return <div style={{ width: "100%" }}>{picker}</div>;
-    }
-    return (
-      <div style={{ width: "100%" }}>
-        <img
-          src={block.image.url}
-          alt=""
-          style={{
-            width: "100%",
-            display: "block",
-            objectFit: "cover",
-            objectPosition: `${block.image.focalX * 100}% ${block.image.focalY * 100}%`,
-          }}
-        />
-      </div>
-    );
-  }
-
-  return (
-    <>
-      {picker}
+  // The ad itself renders identically while editing and while printing, so the
+  // canvas is WYSIWYG. ImagePicker is controls-only (upload / caption / dpi) and
+  // no longer previews the photo, so there is exactly one copy on screen.
+  const body = block.image ? (
+    <div style={{ width: "100%", height: block.heightMm ? `${block.heightMm}mm` : undefined }}>
+      <img
+        src={block.image.url}
+        alt=""
+        style={{
+          width: "100%",
+          height: block.heightMm ? "100%" : undefined,
+          display: "block",
+          objectFit: "cover",
+          objectPosition: `${block.image.focalX * 100}% ${block.image.focalY * 100}%`,
+        }}
+      />
+    </div>
+  ) : (
     <div
       style={{
         width: "100%",
+        height: block.heightMm ? `${block.heightMm}mm` : undefined,
         minHeight: "30mm",
         border: "0.4pt dashed #999",
         display: "flex",
@@ -60,6 +53,27 @@ function Render({ block, editing, onChange }: BlockRenderProps<AdBlock>) {
     >
       {block.placeholderText ?? "आपका विज्ञापन यहाँ"}
     </div>
+  );
+
+  if (!editing) return body;
+
+  return (
+    <>
+      {picker}
+      {body}
+      <div style={{ marginTop: 4 }}>
+        <label className="text-xs text-gray-600">
+          ऊँचाई (मिमी){" "}
+          <input
+            type="number"
+            className="w-20 rounded border border-gray-300 px-1 text-xs"
+            value={block.heightMm ?? ""}
+            onChange={(e) =>
+              onChange({ ...block, heightMm: e.target.value === "" ? undefined : Number(e.target.value) })
+            }
+          />
+        </label>
+      </div>
     </>
   );
 }

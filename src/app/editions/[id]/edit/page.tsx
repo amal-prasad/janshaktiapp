@@ -144,6 +144,9 @@ export default function EditPage() {
       }
       const data = await res.json();
       if (data?.url) window.open(data.url, "_blank");
+    } catch (err) {
+      console.error("PDF export error:", err);
+      alert("सर्वर से कनेक्ट करने में विफल। कृपया सेटिंग्स जांचें।"); // Failed to connect to server. Please check settings.
     } finally {
       setExporting(false);
     }

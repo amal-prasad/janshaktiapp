@@ -29,6 +29,12 @@ export type ImageRef = {
   focalX: number;
   focalY: number;
   caption?: string;
+  /** placed width as % of the column, 20..100. undefined = 100 */
+  widthPct?: number;
+  /** fixed placed height in mm. undefined = auto from the source aspect ratio */
+  heightMm?: number;
+  /** how body text sits against the photo. undefined = "full" (photo above, no wrap) */
+  float?: "left" | "right" | "full";
 };
 
 type Base = { id: string };
@@ -47,6 +53,8 @@ export type AdBlock = Base & {
   type: "ad";
   image?: ImageRef;
   placeholderText?: string;
+  /** fixed placed height in mm, used for full-page ads. undefined = auto */
+  heightMm?: number;
 };
 
 export type HeadlinesBlock = Base & {

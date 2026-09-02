@@ -22,6 +22,7 @@ const emulated = !!process.env.FIRESTORE_EMULATOR_HOST;
 initializeApp({
   ...(emulated ? {} : { credential: applicationDefault() }),
   storageBucket: process.env.STORAGE_BUCKET,
+  serviceAccountId: process.env.SERVICE_ACCOUNT_EMAIL || "814470482288-compute@developer.gserviceaccount.com",
 });
 
 let browser: Browser | undefined;

@@ -25,7 +25,23 @@ const TabbedDate = ({ fields, color }: SlotRenderProps) => (
   </div>
 );
 
+const dateStripFields = [
+  { key: "dateLeft", label: "बायाँ दिनांक (हिंदी)", default: "सोमवार, 2 सितम्बर 2026" },
+  { key: "place", label: "स्थान", default: "रायपुर, छत्तीसगढ़" },
+  { key: "dateRight", label: "दायाँ दिनांक (अंग्रेज़ी)", default: "Monday, 02 September 2026" },
+];
+
+/** Full-width coloured band: left date, centred place, right date, white text. */
+const DateStrip = ({ fields, color }: SlotRenderProps) => (
+  <div style={{ width: "100%", fontFamily: "serif", background: color, color: "#fff", padding: "1mm 3mm", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.72em" }}>
+    <span>{fields.dateLeft}</span>
+    <span style={{ fontWeight: 600 }}>{fields.place}</span>
+    <span>{fields.dateRight}</span>
+  </div>
+);
+
 export const subheaderTemplates: SlotTemplate[] = [
   { id: "tagline", slot: "subheader", label: "केंद्रित टैगलाइन", fields, Render: Tagline },
   { id: "tabbed-date", slot: "subheader", label: "टैब दिनांक", fields, Render: TabbedDate },
+  { id: "date-strip", slot: "subheader", label: "नीली तिथि पट्टी", fields: dateStripFields, Render: DateStrip },
 ];
