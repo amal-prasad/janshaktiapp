@@ -44,6 +44,46 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
     onChange({ ...block, image: { ...image, focalX: x, focalY: y } });
   };
 
+  const startImageResize = (e: React.PointerEvent, type: 'w' | 'h' | 'both') => {
+    e.stopPropagation();
+    const el = figureRef.current;
+    if (!el || !image) return;
+    const parentWidthPx = el.parentElement?.getBoundingClientRect().width ?? 1;
+    const zoom = el.offsetWidth ? el.getBoundingClientRect().width / el.offsetWidth : 1;
+    resizeRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      widthPct: image.widthPct ?? 100,
+      heightMm: image.heightMm ?? el.getBoundingClientRect().height / (MM_TO_PX * zoom),
+    };
+    const onMove = (ev: PointerEvent) => {
+      const start = resizeRef.current;
+      if (!start) return;
+      const dx = ev.clientX - start.x;
+      const dy = ev.clientY - start.y;
+      
+      const newWidthPct = type === 'w' || type === 'both' 
+        ? Math.min(100, Math.max(20, start.widthPct + (dx / parentWidthPx) * 100))
+        : start.widthPct;
+        
+      const newHeightMm = type === 'h' || type === 'both'
+        ? Math.min(blockHeightMm, Math.max(10, start.heightMm + dy / (MM_TO_PX * zoom)))
+        : start.heightMm;
+        
+      onChange({
+        ...block,
+        image: { ...image, widthPct: newWidthPct, heightMm: newHeightMm },
+      });
+    };
+    const onUp = () => {
+      resizeRef.current = null;
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  };
+
   return (
     <div style={{ width: "100%" }}>
       {editing && (
@@ -57,7 +97,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           />
         </label>
       )}
-      <div style={{ height: `${block.heightMm ?? 90}mm`, overflow: "hidden" }}>
+      <div style={{ position: "relative", height: `${block.heightMm ?? 90}mm`, overflow: "hidden" }}>
       <div
         contentEditable={editing}
         suppressContentEditableWarning
@@ -129,6 +169,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
               display: "block",
               objectFit: imgHeightMm ? "cover" : undefined,
               height: imgHeightMm ? `${imgHeightMm}mm` : "auto",
+              maxHeight: imgHeightMm ? undefined : `${blockHeightMm}mm`,
               objectPosition: `${image.focalX * 100}% ${image.focalY * 100}%`,
             }}
           />
@@ -202,59 +243,48 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
                 </button>
               </div>
 
+              {/* E resize handle (width only) */}
               <div
-                onPointerDown={(e) => {
-                  e.stopPropagation();
-                  const el = figureRef.current;
-                  const parentWidthPx = el?.parentElement?.getBoundingClientRect().width ?? 1;
-                  // PageCanvas draws the sheet under a CSS `transform: scale()`, so client
-                  // pixels are zoomed. offsetWidth is the unscaled layout width, so their
-                  // ratio recovers the live zoom without threading it down as a prop.
-                  // Width is a ratio of two client rects, so zoom cancels there -- only the
-                  // mm height conversion needs it.
-                  const zoom = el && el.offsetWidth ? el.getBoundingClientRect().width / el.offsetWidth : 1;
-                  resizeRef.current = {
-                    x: e.clientX,
-                    y: e.clientY,
-                    widthPct: image.widthPct ?? 100,
-                    heightMm: image.heightMm ?? (el?.getBoundingClientRect().height ?? 0) / (MM_TO_PX * zoom),
-                  };
-                  const parentWidth = parentWidthPx;
-                  const onMove = (ev: PointerEvent) => {
-                    const start = resizeRef.current;
-                    if (!start) return;
-                    const dx = ev.clientX - start.x;
-                    const dy = ev.clientY - start.y;
-                    const newWidthPct = Math.min(
-                      100,
-                      Math.max(20, start.widthPct + (dx / parentWidth) * 100)
-                    );
-                    const newHeightMm = Math.min(
-                      blockHeightMm,
-                      Math.max(10, start.heightMm + dy / (MM_TO_PX * zoom))
-                    );
-                    onChange({
-                      ...block,
-                      image: { ...image, widthPct: newWidthPct, heightMm: newHeightMm },
-                    });
-                  };
-                  const onUp = () => {
-                    resizeRef.current = null;
-                    window.removeEventListener("pointermove", onMove);
-                    window.removeEventListener("pointerup", onUp);
-                  };
-                  window.addEventListener("pointermove", onMove);
-                  window.addEventListener("pointerup", onUp);
-                }}
+                onPointerDown={(e) => startImageResize(e, 'w')}
                 style={{
                   position: "absolute",
-                  right: 0,
+                  right: -5,
+                  top: 0,
                   bottom: 0,
                   width: "10px",
+                  cursor: "ew-resize",
+                  touchAction: "none",
+                  zIndex: 10,
+                }}
+              />
+              {/* S resize handle (height only) */}
+              <div
+                onPointerDown={(e) => startImageResize(e, 'h')}
+                style={{
+                  position: "absolute",
+                  bottom: -5,
+                  left: 0,
+                  right: 0,
                   height: "10px",
+                  cursor: "ns-resize",
+                  touchAction: "none",
+                  zIndex: 10,
+                }}
+              />
+              {/* SE resize handle (both) */}
+              <div
+                onPointerDown={(e) => startImageResize(e, 'both')}
+                style={{
+                  position: "absolute",
+                  right: -4,
+                  bottom: -4,
+                  width: "12px",
+                  height: "12px",
                   background: "rgba(37,99,235,0.9)",
                   cursor: "nwse-resize",
                   touchAction: "none",
+                  zIndex: 20,
+                  borderRadius: "2px",
                 }}
               />
             </>
@@ -279,6 +309,39 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
       >
         {block.body}
       </div>
+
+      {editing && (
+        <div
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            const el = e.currentTarget.parentElement;
+            const zoom = el && el.offsetHeight ? el.getBoundingClientRect().height / el.offsetHeight : 1;
+            const startHeightMm = block.heightMm ?? 90;
+            const startY = e.clientY;
+            const onMove = (ev: PointerEvent) => {
+              const dy = ev.clientY - startY;
+              const newHeightMm = Math.max(20, startHeightMm + dy / (MM_TO_PX * zoom));
+              onChange({ ...block, heightMm: newHeightMm });
+            };
+            const onUp = () => {
+              window.removeEventListener("pointermove", onMove);
+              window.removeEventListener("pointerup", onUp);
+            };
+            window.addEventListener("pointermove", onMove);
+            window.addEventListener("pointerup", onUp);
+          }}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: "10px",
+            background: "rgba(37,99,235,0.1)",
+            cursor: "ns-resize",
+            touchAction: "none",
+          }}
+        />
+      )}
       </div>
     </div>
   );
