@@ -181,12 +181,14 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
             columnSpan: imgFloat === "full" ? "all" : "none",
             marginRight: imgFloat === "left" ? "3mm" : undefined,
             marginLeft: imgFloat === "right" ? "3mm" : undefined,
-            marginBottom: wrapping ? "1mm" : "2mm",
+            marginBottom: 0,
             breakInside: "avoid",
             pageBreakInside: "avoid",
             touchAction: editing ? "none" : undefined,
             cursor: editing ? "crosshair" : undefined,
             userSelect: editing ? "none" : undefined,
+            display: "flex",
+            flexDirection: "column",
           }}
           onPointerDown={editing ? (e) => {
             draggingFocalRef.current = true;
