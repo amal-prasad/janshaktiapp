@@ -62,11 +62,11 @@ export function findBlock(rows: Row[], blockId: string): Block | null {
 export function findBlockLocation(
   rows: Row[],
   blockId: string,
-): { rowId: string; colId: string; block: Block } | null {
+): { rowId: string; colId: string; span: number; block: Block } | null {
   for (const r of rows) {
     for (const c of r.cols) {
       const b = c.blocks.find((x) => x.id === blockId);
-      if (b) return { rowId: r.id, colId: c.id, block: b };
+      if (b) return { rowId: r.id, colId: c.id, span: c.span, block: b };
     }
   }
   return null;

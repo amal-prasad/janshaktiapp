@@ -7,15 +7,18 @@ import { columnWidthMm } from "@/lib/dpi";
 import { PrintContext } from "./printContext";
 import ElementsPanel from "./ElementsPanel";
 
-type Props = {
-  col: Column;
-  editionId: string;
-  pageWmm: number;
-  readOnly?: boolean;
+type ColumnOps = {
   onAddBlock: (block: Block) => void;
   onUpdateBlock: (blockId: string, next: Block) => void;
   onRemoveBlock: (blockId: string) => void;
   onMoveBlock: (blockId: string, dir: "up" | "down") => void;
+};
+
+type Props = {
+  col: Column;
+  editionId: string;
+  pageWmm: number;
+  ops?: ColumnOps;
   selectedBlockId?: string | null;
   onSelectBlock?: (blockId: string) => void;
 };
@@ -24,14 +27,11 @@ export default function ColumnCell({
   col,
   editionId,
   pageWmm,
-  readOnly,
-  onAddBlock,
-  onUpdateBlock,
-  onRemoveBlock,
-  onMoveBlock,
+  ops,
   selectedBlockId,
   onSelectBlock,
 }: Props) {
+  const editing = !!ops;
   const [pickerOpen, setPickerOpen] = useState(false);
   const [hideAdd, setHideAdd] = useState(false);
 
@@ -42,7 +42,7 @@ export default function ColumnCell({
   );
 
   const pick = (type: BlockType) => {
-    onAddBlock(BLOCKS[type].create());
+    ops?.onAddBlock(BLOCKS[type].create());
     setPickerOpen(false);
   };
 
@@ -50,7 +50,7 @@ export default function ColumnCell({
     <PrintContext.Provider value={print}>
     <div
       className={`group/col min-h-[40px] ${
-        !readOnly && col.blocks.length === 0 ? "border border-dashed border-gray-300" : ""
+        editing && col.blocks.length === 0 ? "border border-dashed border-gray-300" : ""
       }`}
       style={{ display: "flex", flexDirection: "column", gap: "3mm" }}
     >
@@ -61,15 +61,15 @@ export default function ColumnCell({
           <div
             key={b.id}
             className={`group relative ${
-              !readOnly && b.id === selectedBlockId ? "ring-2 ring-blue-500" : ""
+              editing && b.id === selectedBlockId ? "ring-2 ring-blue-500" : ""
             }`}
-            onClick={() => !readOnly && onSelectBlock?.(b.id)}
+            onClick={() => editing && onSelectBlock?.(b.id)}
           >
-            {!readOnly && (
+            {editing && (
               <div className="absolute right-0 top-0 z-10 hidden gap-1 bg-white/90 p-0.5 text-xs group-hover:flex">
                 <button
                   disabled={i === 0}
-                  onClick={() => onMoveBlock(b.id, "up")}
+                  onClick={() => ops.onMoveBlock(b.id, "up")}
                   className="px-1 disabled:opacity-30"
                   title="ऊपर ले जाएँ"
                 >
@@ -77,14 +77,14 @@ export default function ColumnCell({
                 </button>
                 <button
                   disabled={i === col.blocks.length - 1}
-                  onClick={() => onMoveBlock(b.id, "down")}
+                  onClick={() => ops.onMoveBlock(b.id, "down")}
                   className="px-1 disabled:opacity-30"
                   title="नीचे ले जाएँ"
                 >
                   ↓
                 </button>
                 <button
-                  onClick={() => onRemoveBlock(b.id)}
+                  onClick={() => ops.onRemoveBlock(b.id)}
                   className="px-1 text-red-600"
                   title="हटाएँ"
                 >
@@ -94,14 +94,14 @@ export default function ColumnCell({
             )}
             <Render
               block={b}
-              editing={!readOnly}
-              onChange={(next: Block) => onUpdateBlock(b.id, next)}
+              editing={editing}
+              onChange={ops ? (next: Block) => ops.onUpdateBlock(b.id, next) : () => {}}
             />
           </div>
         );
       })}
 
-      {!readOnly && !hideAdd && (
+      {editing && !hideAdd && (
         <div
           className={`flex w-full items-center transition-opacity ${
             col.blocks.length > 0 ? "opacity-0 group-hover/col:opacity-100" : ""

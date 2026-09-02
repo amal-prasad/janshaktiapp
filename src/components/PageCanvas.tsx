@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import ColumnCell from "@/components/editor/ColumnCell";
+import RowView, { type RowOps } from "@/components/RowView";
 import SlotRender from "@/components/headers/SlotRender";
 import { addBlock, moveBlock, removeBlock, updateBlock } from "@/components/editor/rowOps";
-import type { Block, HeaderSlot, PageSizeMm, Row, SlotConfig } from "@/lib/types";
+import type { HeaderSlot, PageSizeMm, Row, SlotConfig } from "@/lib/types";
 
 const MM_TO_PX = 96 / 25.4;
 
@@ -76,13 +76,11 @@ export default function PageCanvas({
 
   const scale = fitScale * zoom;
 
-  const colOps = (rowId: string, colId: string) => ({
-    onAddBlock: (block: Block) => onRowsChange(addBlock(rows, rowId, colId, block)),
-    onUpdateBlock: (blockId: string, next: Block) =>
-      onRowsChange(updateBlock(rows, rowId, colId, blockId, next)),
-    onRemoveBlock: (blockId: string) => onRowsChange(removeBlock(rows, rowId, colId, blockId)),
-    onMoveBlock: (blockId: string, dir: "up" | "down") =>
-      onRowsChange(moveBlock(rows, rowId, colId, blockId, dir)),
+  const rowOps = (rowId: string): RowOps => ({
+    onAddBlock: (colId, block) => onRowsChange(addBlock(rows, rowId, colId, block)),
+    onUpdateBlock: (colId, blockId, next) => onRowsChange(updateBlock(rows, rowId, colId, blockId, next)),
+    onRemoveBlock: (colId, blockId) => onRowsChange(removeBlock(rows, rowId, colId, blockId)),
+    onMoveBlock: (colId, blockId, dir) => onRowsChange(moveBlock(rows, rowId, colId, blockId, dir)),
   });
 
   return (
@@ -135,28 +133,15 @@ export default function PageCanvas({
             {pageIndex === 0 && <SlotRender slot="subheader" config={slots.subheader} />}
 
             {rows.map((row) => (
-              <div
+              <RowView
                 key={row.id}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: row.cols.map((c) => `${c.span}fr`).join(" "),
-                  gap: "4mm",
-                  marginBottom: "4mm",
-                }}
-              >
-                {row.cols.map((col) => (
-                  <ColumnCell
-                    key={col.id}
-                    col={col}
-                    editionId={editionId}
-                    pageWmm={pageSizeMm.w}
-                    readOnly={readOnly}
-                    selectedBlockId={selectedBlockId}
-                    onSelectBlock={onSelectBlock}
-                    {...colOps(row.id, col.id)}
-                  />
-                ))}
-              </div>
+                row={row}
+                editionId={editionId}
+                pageWmm={pageSizeMm.w}
+                ops={readOnly ? undefined : rowOps(row.id)}
+                selectedBlockId={selectedBlockId}
+                onSelectBlock={onSelectBlock}
+              />
             ))}
 
             <SlotRender slot="footer" config={slots.footer} />

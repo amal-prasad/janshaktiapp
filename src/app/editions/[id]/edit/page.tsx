@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import AuthGate from "@/components/AuthGate";
 import PageCanvas from "@/components/PageCanvas";
 import RowGrid from "@/components/RowGrid";
+import ArticlePanel from "@/components/editor/ArticlePanel";
 import FontPanel from "@/components/editor/FontPanel";
 import LockBanner from "@/components/editor/LockBanner";
 import PagesPanel from "@/components/editor/PagesPanel";
@@ -16,8 +17,9 @@ import type { EditionDoc, PageDoc, Row } from "@/lib/types";
 
 const RETRY_MS = 15 * 1000;
 
-type Tab = "header" | "layout" | "font" | "pages";
+type Tab = "article" | "header" | "layout" | "font" | "pages";
 const TABS: { id: Tab; label: string }[] = [
+  { id: "article", label: "आर्टिकल" },
   { id: "header", label: "हेडर/फुटर" },
   { id: "layout", label: "लेआउट" },
   { id: "font", label: "फ़ॉन्ट" },
@@ -156,6 +158,16 @@ export default function EditPage() {
   const renderTabContent = (tab: Tab) => {
     if (!edition) return null;
     switch (tab) {
+      case "article":
+        return edition ? (
+          <ArticlePanel
+            rows={rows}
+            onRowsChange={onRowsChange}
+            selectedBlockId={selectedBlockId}
+            editionId={editionId}
+            pageWmm={edition.pageSizeMm.w}
+          />
+        ) : null;
       case "header":
         return <SlotPicker editionId={editionId} edition={edition} />;
       case "layout":
@@ -200,7 +212,20 @@ export default function EditPage() {
         </header>
 
         <div className="relative flex flex-1 overflow-hidden">
-          <div className="flex flex-1 flex-col md:mr-80">
+          {/* Desktop left rail: persistent Article panel */}
+          <div className="hidden md:absolute md:left-0 md:top-0 md:flex md:h-full md:w-72 md:flex-col md:overflow-y-auto md:border-r md:bg-white">
+            {edition && (
+              <ArticlePanel
+                rows={rows}
+                onRowsChange={onRowsChange}
+                selectedBlockId={selectedBlockId}
+                editionId={editionId}
+                pageWmm={edition.pageSizeMm.w}
+              />
+            )}
+          </div>
+
+          <div className="flex flex-1 flex-col md:ml-72 md:mr-80">
             {/* Never gate on lockHolder: a not-yet-refreshed pages list would hide the
                 banner and leave the editor silently read-only. */}
             {readOnly && <LockBanner holderUid={lockHolder} />}
