@@ -47,7 +47,9 @@ export default function ColumnCell({
   return (
     <PrintContext.Provider value={print}>
     <div
-      className="min-h-[40px] border border-dashed border-gray-300"
+      className={`group/col min-h-[40px] ${
+        !readOnly && col.blocks.length === 0 ? "border border-dashed border-gray-300" : ""
+      }`}
       style={{ display: "flex", flexDirection: "column", gap: "3mm" }}
     >
       {col.blocks.map((b, i) => {
@@ -100,7 +102,9 @@ export default function ColumnCell({
       {!readOnly && (
         <button
           onClick={() => setPickerOpen(true)}
-          className="flex w-full items-center justify-center py-3 text-lg text-gray-400 hover:bg-gray-50"
+          className={`flex w-full flex-1 items-center justify-center py-2 text-lg text-gray-400 transition-opacity hover:bg-gray-50 ${
+            col.blocks.length > 0 ? "opacity-0 group-hover/col:opacity-100" : ""
+          }`}
           title="एलिमेंट जोड़ें"
         >
           +
