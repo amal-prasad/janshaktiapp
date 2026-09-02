@@ -6,6 +6,8 @@ export type SlotRenderProps = {
   fields: Record<string, string>;
   color: string;
   logoUrl?: string;
+  editing?: boolean;
+  onChange?: (fields: Record<string, string>) => void;
 };
 
 export type SlotField = { key: string; label: string; default: string };

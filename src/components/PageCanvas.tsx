@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import RowView, { type RowOps } from "@/components/RowView";
 import SlotRender from "@/components/headers/SlotRender";
 import { addBlock, moveBlock, removeBlock, updateBlock } from "@/components/editor/rowOps";
+import { setSlot } from "@/lib/edition";
 import type { HeaderSlot, PageSizeMm, Row, SlotConfig } from "@/lib/types";
 
 const MM_TO_PX = 96 / 25.4;
@@ -128,8 +129,8 @@ export default function PageCanvas({
               } as React.CSSProperties
             }
           >
-            {pageIndex === 0 && <SlotRender slot="header" config={slots.header} />}
-            {pageIndex === 0 && <SlotRender slot="header2" config={slots.header2} />}
+            {pageIndex === 0 && <SlotRender slot="header" config={slots.header} editing={!readOnly} onChange={(config) => setSlot(editionId, "header", config)} />}
+            {pageIndex === 0 && <SlotRender slot="header2" config={slots.header2} editing={!readOnly} onChange={(config) => setSlot(editionId, "header2", config)} />}
 
             {rows.map((row) => (
               <RowView
