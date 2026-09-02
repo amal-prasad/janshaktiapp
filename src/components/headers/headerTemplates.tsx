@@ -13,7 +13,7 @@ const commonFields = [
 function Logo({ logoUrl, name, janshakti }: { logoUrl?: string; name: string; janshakti?: boolean }) {
   const finalLogoUrl = janshakti ? "/logo.png?v=2" : logoUrl;
   if (finalLogoUrl) {
-    return <img src={finalLogoUrl} alt={name} style={{ height: janshakti ? "50mm" : "14mm", maxWidth: "100%", objectFit: "contain" }} />;
+    return <img src={finalLogoUrl} alt={name} style={{ height: janshakti ? "35mm" : "14mm", maxWidth: "100%", objectFit: "contain" }} />;
   }
   return null;
 }
@@ -117,7 +117,9 @@ const Janshakti = ({ fields, color, logoUrl }: SlotRenderProps) => (
       </div>
       <div style={{ textAlign: "center", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
         <Logo logoUrl={logoUrl} name={fields.newspaperName} janshakti={true} />
-        {/* We no longer show the h1 fallback for Janshakti template because it defaults to /logo.png */}
+        <h1 style={{ fontSize: "3.4em", fontWeight: 900, letterSpacing: "0.02em", margin: 0, textAlign: "center", color: "#111" }}>
+          {fields.newspaperName}
+        </h1>
         <div style={{ fontSize: "1em", fontWeight: 600, margin: "1mm 0 0" }}>{fields.tagline}</div>
       </div>
       <div style={{ flex: "0 0 45mm", border: `1pt solid ${color}`, padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center", minHeight: "20mm" }}>
