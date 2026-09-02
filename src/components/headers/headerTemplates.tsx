@@ -11,7 +11,7 @@ const commonFields = [
 ];
 
 function Logo({ logoUrl, name, janshakti }: { logoUrl?: string; name: string; janshakti?: boolean }) {
-  const finalLogoUrl = logoUrl || (janshakti ? "/logo.png" : undefined);
+  const finalLogoUrl = janshakti ? "/logo.png?v=2" : logoUrl;
   if (finalLogoUrl) {
     return <img src={finalLogoUrl} alt={name} style={{ height: janshakti ? "35mm" : "14mm", maxWidth: "100%", objectFit: "contain" }} />;
   }
