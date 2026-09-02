@@ -33,7 +33,13 @@ export default async function PrintPage({
       {/* preferCSSPageSize in the render service reads this. */}
       <style>{`
         @page { size: ${w}mm ${h}mm; margin: 0; }
-        html, body { margin: 0; padding: 0; background: #fff; }
+        html, body { 
+          margin: 0; 
+          padding: 0; 
+          background: #fff; 
+          -webkit-print-color-adjust: exact; 
+          print-color-adjust: exact; 
+        }
         .print-sheet { break-after: page; page-break-after: always; }
         .print-sheet:last-child { break-after: auto; page-break-after: auto; }
       `}</style>
