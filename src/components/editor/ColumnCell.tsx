@@ -100,19 +100,15 @@ export default function ColumnCell({
       })}
 
       {!readOnly && (
-        <div className={col.blocks.length > 0 ? "relative z-10 h-0 w-full" : "flex w-full flex-1"}>
-          <button
-            onClick={() => setPickerOpen(true)}
-            className={`flex w-full items-center justify-center py-2 text-lg text-gray-400 transition-opacity ${
-              col.blocks.length > 0
-                ? "absolute left-0 top-0 opacity-0 group-hover/col:opacity-100 bg-white/90 border border-gray-200 shadow hover:bg-gray-100"
-                : "flex-1 hover:bg-gray-50"
-            }`}
-            title="एलिमेंट जोड़ें"
-          >
-            +
-          </button>
-        </div>
+        <button
+          onClick={() => setPickerOpen(true)}
+          className={`flex w-full flex-1 items-center justify-center py-2 text-lg text-gray-400 transition-opacity hover:bg-gray-50 ${
+            col.blocks.length > 0 ? "opacity-0 group-hover/col:opacity-100" : ""
+          }`}
+          title="एलिमेंट जोड़ें"
+        >
+          +
+        </button>
       )}
 
       {pickerOpen && <ElementsPanel onPick={pick} onClose={() => setPickerOpen(false)} />}
