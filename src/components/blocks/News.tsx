@@ -107,7 +107,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
   return (
     <div style={{ width: "100%" }}>
       <div
-        style={{ position: "relative", display: "flex", flexDirection: "column", height: `${block.heightMm ?? 90}mm`, overflow: "hidden" }}
+        style={{ position: "relative", display: "flex", flexDirection: "column", height: `${block.heightMm ?? 90}mm`, overflow: "hidden", contain: "paint" }}
         onClick={(e) => {
           if (editing && e.target === e.currentTarget && bodyRef.current) {
             bodyRef.current.focus();
@@ -162,6 +162,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
         style={{
           columnCount: block.columns ?? (wrapping ? 1 : 2),
           columnGap: "4mm",
+          columnFill: "auto",
           flex: "1 1 auto",
           minHeight: 0,
           overflow: "hidden",
