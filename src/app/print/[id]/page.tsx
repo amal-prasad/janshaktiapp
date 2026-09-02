@@ -37,8 +37,10 @@ export default async function PrintPage({
           margin: 0; 
           padding: 0; 
           background: #fff; 
-          -webkit-print-color-adjust: exact; 
-          print-color-adjust: exact; 
+        }
+        * {
+          -webkit-print-color-adjust: exact !important; 
+          print-color-adjust: exact !important; 
         }
         .print-sheet { break-after: page; page-break-after: always; }
         .print-sheet:last-child { break-after: auto; page-break-after: auto; }
