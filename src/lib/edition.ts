@@ -26,7 +26,7 @@ export async function createEdition(uid: string, title: string, date: string): P
     slots: {
       header: emptySlot("janshakti"),
       header2: emptySlot("strip", false),
-      subheader: { ...emptySlot("date-strip", true), color: "#0b4a8f" },
+      subheader: { ...emptySlot("janshakti-strip", true), color: "#0b4a8f" },
       footer: emptySlot("simple"),
     },
   } satisfies Omit<EditionDoc, "id">);

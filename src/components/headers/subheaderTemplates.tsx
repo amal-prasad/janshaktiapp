@@ -46,28 +46,26 @@ const janshaktiSubheaderFields = [
   { key: "frequency", label: "आवृत्ति", default: "(प्रति सोमवार)" },
   { key: "datePlace", label: "स्थान और दिनांक", default: "इंदौर, 24 अगस्त से 30 अगस्त 2026" },
   { key: "pages", label: "पेज", default: "8" },
-  { key: "price", label: "मूल्य", default: "2 रूपये" },
+  { key: "price", label: "मूल्य", default: "2 रुपये" },
 ];
 
 /** Full-width coloured band matching Janshakti layout: year/issue left, place/date centered, pages/price right */
 const JanshaktiStrip = ({ fields, color }: SlotRenderProps) => (
-  <div style={{ width: "100%", fontFamily: "serif" }}>
-    <div style={{ background: color, color: "#fff", padding: "1mm 2mm", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.75em", fontWeight: 500 }}>
-      <div style={{ display: "flex", gap: "6mm" }}>
+  <div style={{ width: "100%", fontFamily: "sans-serif" }}>
+    <div style={{ background: color, color: "#fff", padding: "1.2mm 3mm", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.78em", fontWeight: 700 }}>
+      <div style={{ display: "flex", gap: "8mm" }}>
         <span>वर्ष : {fields.year}</span>
         <span>अंक : {fields.issue}</span>
         <span>{fields.frequency}</span>
       </div>
-      <div style={{ fontWeight: 600, letterSpacing: "0.02em" }}>
+      <div style={{ letterSpacing: "0.02em" }}>
         {fields.datePlace}
       </div>
-      <div style={{ display: "flex", gap: "6mm" }}>
+      <div style={{ display: "flex", gap: "8mm" }}>
         <span>पेज : {fields.pages}</span>
         <span>मूल्य : {fields.price}</span>
       </div>
     </div>
-    <div style={{ borderBottom: "0.3pt solid #111", marginTop: "0.5mm" }} />
-    <div style={{ borderBottom: "0.3pt solid #111", marginTop: "0.3mm" }} />
   </div>
 );
 
