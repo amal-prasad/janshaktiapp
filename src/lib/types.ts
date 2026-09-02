@@ -41,6 +41,7 @@ type Base = { id: string };
 
 export type NewsBlock = Base & {
   type: "news";
+  subhead?: string;
   headline: string;
   byline?: string;
   body: string;

@@ -125,6 +125,25 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           }
         }}
       >
+      {(editing || block.subhead) && (
+        <div
+          contentEditable={editing}
+          suppressContentEditableWarning
+          onBlur={(e) =>
+            editing && onChange({ ...block, subhead: e.currentTarget.textContent ?? "" })
+          }
+          className="empty:before:content-['सबहेडर'] empty:before:text-gray-400 focus:outline-none"
+          style={{
+            color: "#dc2626", // Red text to match the example kicker
+            fontWeight: 700,
+            fontSize: `${1.1 * (block.headlineScale ?? 1)}em`,
+            marginBottom: "0.5mm",
+          }}
+        >
+          {block.subhead}
+        </div>
+      )}
+
       <div
         contentEditable={editing}
         suppressContentEditableWarning
