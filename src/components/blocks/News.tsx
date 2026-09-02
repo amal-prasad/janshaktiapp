@@ -29,6 +29,10 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
 
   const image = block.image;
   const wrapping = image?.float === "left" || image?.float === "right";
+  const blockHeightMm = block.heightMm ?? 90;
+  // image.heightMm can outlive a block resize (dragged before heightMm shrank the
+  // box) -- clamp so `cover` never zooms into a crop taller than what's shown.
+  const imgHeightMm = image?.heightMm ? Math.min(image.heightMm, blockHeightMm) : undefined;
 
   const setFocalFromEvent = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!image) return;
@@ -123,8 +127,8 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
             style={{
               width: "100%",
               display: "block",
-              objectFit: image.heightMm ? "cover" : undefined,
-              height: image.heightMm ? `${image.heightMm}mm` : "auto",
+              objectFit: imgHeightMm ? "cover" : undefined,
+              height: imgHeightMm ? `${imgHeightMm}mm` : "auto",
               objectPosition: `${image.focalX * 100}% ${image.focalY * 100}%`,
             }}
           />
@@ -226,7 +230,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
                       Math.max(20, start.widthPct + (dx / parentWidth) * 100)
                     );
                     const newHeightMm = Math.min(
-                      400,
+                      blockHeightMm,
                       Math.max(10, start.heightMm + dy / (MM_TO_PX * zoom))
                     );
                     onChange({
