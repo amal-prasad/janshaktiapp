@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { NewsBlock } from "@/lib/types";
 import type { BlockDef, BlockRenderProps } from "@/components/blocks/registry";
@@ -16,7 +16,11 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
   const { editionId, placedMm } = usePrintContext();
   const figureRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const columnWrapRef = useRef<HTMLDivElement>(null);
   const draggingFocalRef = useRef(false);
+  // Clip figure+body at the last full text line instead of an arbitrary pixel --
+  // a mid-line cut looks broken, a few mm of slack below the last line does not.
+  const [bodyMaxHeightPx, setBodyMaxHeightPx] = useState<number | null>(null);
   const resizeRef = useRef<{ x: number; y: number; widthPct: number; heightMm: number } | null>(
     null
   );
@@ -89,6 +93,21 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
     window.addEventListener("pointerup", onUp);
   };
 
+  useEffect(() => {
+    const wrap = columnWrapRef.current;
+    const body = bodyRef.current;
+    if (!wrap || !body) return;
+    const recompute = () => {
+      const lineHeightPx = parseFloat(getComputedStyle(body).lineHeight) || 1;
+      const lines = Math.max(1, Math.floor(wrap.clientHeight / lineHeightPx));
+      setBodyMaxHeightPx(lines * lineHeightPx);
+    };
+    recompute();
+    const ro = new ResizeObserver(recompute);
+    ro.observe(wrap);
+    return () => ro.disconnect();
+  }, [block.heightMm, block.columns, image]);
+
   return (
     <div style={{ width: "100%" }}>
       {editing && (
@@ -117,8 +136,8 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           </label>
         </div>
       )}
-      <div 
-        style={{ position: "relative", height: `${block.heightMm ?? 90}mm`, overflow: "hidden" }}
+      <div
+        style={{ position: "relative", display: "flex", flexDirection: "column", height: `${block.heightMm ?? 90}mm`, overflow: "hidden" }}
         onClick={(e) => {
           if (editing && e.target === e.currentTarget && bodyRef.current) {
             bodyRef.current.focus();
@@ -178,10 +197,14 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
       )}
 
       <div
+        ref={columnWrapRef}
         style={{
           columnCount: block.columns ?? (wrapping ? 1 : 2),
           columnGap: "4mm",
-          height: "100%", // Ensures the column wrapper spans available height to make it clickable
+          flex: "1 1 auto",
+          minHeight: 0,
+          overflow: "hidden",
+          maxHeight: bodyMaxHeightPx != null ? `${bodyMaxHeightPx}px` : undefined,
         }}
         onClick={(e) => {
           if (editing && e.target === e.currentTarget && bodyRef.current) {
