@@ -33,6 +33,8 @@ export default function ColumnCell({
   onSelectBlock,
 }: Props) {
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [hideAdd, setHideAdd] = useState(false);
+
   // Printed width of this column, so image blocks can judge their own dpi.
   const print = useMemo(
     () => ({ editionId, placedMm: columnWidthMm(col.span, pageWmm) }),
@@ -99,16 +101,32 @@ export default function ColumnCell({
         );
       })}
 
-      {!readOnly && (
-        <button
-          onClick={() => setPickerOpen(true)}
-          className={`flex w-full flex-1 items-center justify-center py-2 text-lg text-gray-400 transition-opacity hover:bg-gray-50 ${
+      {!readOnly && !hideAdd && (
+        <div
+          className={`flex w-full items-center transition-opacity ${
             col.blocks.length > 0 ? "opacity-0 group-hover/col:opacity-100" : ""
           }`}
-          title="एलिमेंट जोड़ें"
         >
-          +
-        </button>
+          <button
+            onClick={() => setPickerOpen(true)}
+            className="flex flex-1 items-center justify-center py-2 text-lg text-gray-400 hover:bg-gray-50"
+            title="एलिमेंट जोड़ें"
+          >
+            +
+          </button>
+          {col.blocks.length > 0 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setHideAdd(true);
+              }}
+              className="flex items-center justify-center px-4 py-2 text-lg text-red-500 hover:bg-red-50"
+              title="यह जोड़ें बटन छिपाएँ"
+            >
+              ✕
+            </button>
+          )}
+        </div>
       )}
 
       {pickerOpen && <ElementsPanel onPick={pick} onClose={() => setPickerOpen(false)} />}
