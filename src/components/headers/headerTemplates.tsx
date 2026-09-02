@@ -10,9 +10,9 @@ const commonFields = [
   { key: "edition", label: "संस्करण", default: "रायपुर संस्करण" },
 ];
 
-function Logo({ logoUrl, name }: { logoUrl?: string; name: string }) {
+function Logo({ logoUrl, name, janshakti }: { logoUrl?: string; name: string; janshakti?: boolean }) {
   if (logoUrl) {
-    return <img src={logoUrl} alt={name} style={{ height: "14mm", objectFit: "contain" }} />;
+    return <img src={logoUrl} alt={name} style={{ height: janshakti ? "35mm" : "14mm", maxWidth: "100%", objectFit: "contain" }} />;
   }
   return null;
 }
@@ -97,35 +97,35 @@ const BoxedMinimal = ({ fields, color, logoUrl }: SlotRenderProps) => (
 
 const janshaktiFields = [
   ...commonFields,
-  { key: "leftBox1", label: "बायाँ बॉक्स - पंक्ति 1", default: "वर्ष 12 · अंक 245" },
-  { key: "leftBox2", label: "बायाँ बॉक्स - पंक्ति 2", default: "रायपुर संस्करण" },
-  { key: "rightBox1", label: "दायाँ बॉक्स - पंक्ति 1", default: "मूल्य ₹ 5.00" },
-  { key: "rightBox2", label: "दायाँ बॉक्स - पंक्ति 2", default: "RNI No. CHHHIN/2014/57145" },
+  { key: "leftBox1", label: "बायाँ बॉक्स - पंक्ति 1", default: "" },
+  { key: "leftBox2", label: "बायाँ बॉक्स - पंक्ति 2", default: "" },
+  { key: "rightBox1", label: "दायाँ बॉक्स - पंक्ति 1", default: "" },
+  { key: "rightBox2", label: "दायाँ बॉक्स - पंक्ति 2", default: "" },
 ];
 
 /** Three-column masthead: bordered info box left, logo/name/tagline centred, mirrored box right. */
 const Janshakti = ({ fields, color, logoUrl }: SlotRenderProps) => (
   <div style={{ width: "100%", fontFamily: "serif", color: "#111" }}>
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "3mm", padding: "1.5mm 1mm" }}>
-      <div style={{ border: `1pt solid ${color}`, padding: "1mm 2.5mm", fontSize: "0.7em", lineHeight: 1.3, textAlign: "center" }}>
+    <div style={{ display: "flex", alignItems: "stretch", justifyContent: "space-between", gap: "3mm", padding: "1.5mm 1mm" }}>
+      <div style={{ flex: "0 0 45mm", border: `1pt solid ${color}`, padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center", minHeight: "20mm" }}>
         <div>{fields.leftBox1}</div>
         <div>{fields.leftBox2}</div>
       </div>
-      <div style={{ textAlign: "center", flex: 1 }}>
-        <Logo logoUrl={logoUrl} name={fields.newspaperName} />
+      <div style={{ textAlign: "center", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+        <Logo logoUrl={logoUrl} name={fields.newspaperName} janshakti={true} />
         {!logoUrl && (
-          <h1 style={{ fontSize: "3.2em", fontWeight: 900, letterSpacing: "0.02em", margin: 0, color }}>
+          <h1 style={{ fontSize: "3.5em", fontWeight: 900, letterSpacing: "0.02em", margin: 0, color }}>
             {fields.newspaperName}
           </h1>
         )}
-        <div style={{ fontSize: "0.82em", fontStyle: "italic", margin: "0.5mm 0" }}>{fields.tagline}</div>
+        <div style={{ fontSize: "1em", fontWeight: 600, margin: "1mm 0 0" }}>{fields.tagline}</div>
       </div>
-      <div style={{ border: `1pt solid ${color}`, padding: "1mm 2.5mm", fontSize: "0.7em", lineHeight: 1.3, textAlign: "center" }}>
+      <div style={{ flex: "0 0 45mm", border: `1pt solid ${color}`, padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center", minHeight: "20mm" }}>
         <div>{fields.rightBox1}</div>
         <div>{fields.rightBox2}</div>
       </div>
     </div>
-    <div style={{ borderBottom: `2.2pt solid ${color}` }} />
+    <div style={{ borderBottom: `2pt solid ${color}` }} />
   </div>
 );
 

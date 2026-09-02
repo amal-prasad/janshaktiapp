@@ -40,8 +40,40 @@ const DateStrip = ({ fields, color }: SlotRenderProps) => (
   </div>
 );
 
+const janshaktiSubheaderFields = [
+  { key: "year", label: "वर्ष", default: "" },
+  { key: "issue", label: "अंक", default: "" },
+  { key: "frequency", label: "आवृत्ति", default: "(प्रति सोमवार)" },
+  { key: "datePlace", label: "स्थान और दिनांक", default: "इंदौर, 24 अगस्त से 30 अगस्त 2026" },
+  { key: "pages", label: "पेज", default: "8" },
+  { key: "price", label: "मूल्य", default: "2 रूपये" },
+];
+
+/** Full-width coloured band matching Janshakti layout: year/issue left, place/date centered, pages/price right */
+const JanshaktiStrip = ({ fields, color }: SlotRenderProps) => (
+  <div style={{ width: "100%", fontFamily: "serif" }}>
+    <div style={{ background: color, color: "#fff", padding: "1mm 2mm", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.75em", fontWeight: 500 }}>
+      <div style={{ display: "flex", gap: "6mm" }}>
+        <span>वर्ष : {fields.year}</span>
+        <span>अंक : {fields.issue}</span>
+        <span>{fields.frequency}</span>
+      </div>
+      <div style={{ fontWeight: 600, letterSpacing: "0.02em" }}>
+        {fields.datePlace}
+      </div>
+      <div style={{ display: "flex", gap: "6mm" }}>
+        <span>पेज : {fields.pages}</span>
+        <span>मूल्य : {fields.price}</span>
+      </div>
+    </div>
+    <div style={{ borderBottom: "0.3pt solid #111", marginTop: "0.5mm" }} />
+    <div style={{ borderBottom: "0.3pt solid #111", marginTop: "0.3mm" }} />
+  </div>
+);
+
 export const subheaderTemplates: SlotTemplate[] = [
   { id: "tagline", slot: "subheader", label: "केंद्रित टैगलाइन", fields, Render: Tagline },
   { id: "tabbed-date", slot: "subheader", label: "टैब दिनांक", fields, Render: TabbedDate },
   { id: "date-strip", slot: "subheader", label: "नीली तिथि पट्टी", fields: dateStripFields, Render: DateStrip },
+  { id: "janshakti-strip", slot: "subheader", label: "जनशक्ति पट्टी", fields: janshaktiSubheaderFields, Render: JanshaktiStrip },
 ];
