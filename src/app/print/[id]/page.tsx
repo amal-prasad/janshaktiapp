@@ -3,6 +3,7 @@ import SlotRender from "@/components/headers/SlotRender";
 import { loadForPrint, verifyToken } from "@/lib/admin";
 import type { PageDoc } from "@/lib/types";
 import RowView from "./RowView";
+import AutoPrint from "@/components/AutoPrint";
 
 // Fully server-rendered: no hydration race for headless Chromium to lose.
 export const dynamic = "force-dynamic";
@@ -61,6 +62,7 @@ export default async function PrintPage({
           </div>
         ))}
       </div>
+      <AutoPrint />
     </>
   );
 }

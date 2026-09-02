@@ -131,22 +131,10 @@ export default function EditPage() {
     setExporting(true);
     try {
       const token = await user.getIdToken();
-      const res = await fetch(`${process.env.NEXT_PUBLIC_RENDER_URL}/render`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ editionId }),
-      });
-      // The render service answers with plain text on failure; res.json() would
-      // throw and surface as an unhandled rejection with no user feedback.
-      if (!res.ok) {
-        alert("PDF निर्यात विफल रहा। कृपया दोबारा प्रयास करें।");
-        return;
-      }
-      const data = await res.json();
-      if (data?.url) window.open(data.url, "_blank");
+      window.open(`/print/${editionId}?token=${token}`, "_blank");
     } catch (err) {
-      console.error("PDF export error:", err);
-      alert("सर्वर से कनेक्ट करने में विफल। कृपया सेटिंग्स जांचें।"); // Failed to connect to server. Please check settings.
+      console.error("PDF preview error:", err);
+      alert("PDF पूर्वावलोकन खोलने में विफल।");
     } finally {
       setExporting(false);
     }
