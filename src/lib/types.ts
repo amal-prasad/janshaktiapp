@@ -47,6 +47,8 @@ export type NewsBlock = Base & {
   image?: ImageRef;
   /** headline scale multiplier, 1 = default */
   headlineScale?: number;
+  /** fixed block height in mm; body text clips at this, doesn't push page. undefined = 90mm */
+  heightMm?: number;
 };
 
 export type AdBlock = Base & {

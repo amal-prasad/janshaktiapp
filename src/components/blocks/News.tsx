@@ -42,6 +42,18 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
 
   return (
     <div style={{ width: "100%" }}>
+      {editing && (
+        <label className="mb-1 block text-xs text-gray-600">
+          ऊँचाई (मिमी){" "}
+          <input
+            type="number"
+            className="w-20 rounded border border-gray-300 px-1 text-xs"
+            value={block.heightMm ?? 90}
+            onChange={(e) => onChange({ ...block, heightMm: Number(e.target.value) || 90 })}
+          />
+        </label>
+      )}
+      <div style={{ height: `${block.heightMm ?? 90}mm`, overflow: "hidden" }}>
       <div
         contentEditable={editing}
         suppressContentEditableWarning
@@ -116,10 +128,20 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
               objectPosition: `${image.focalX * 100}% ${image.focalY * 100}%`,
             }}
           />
-          {image.caption && (
-            <div style={{ fontStyle: "italic", fontSize: "0.7em", marginTop: "0.5mm" }}>
-              {image.caption}
-            </div>
+          {editing ? (
+            <input
+              type="text"
+              value={image.caption ?? ""}
+              onChange={(e) => onChange({ ...block, image: { ...image, caption: e.target.value } })}
+              placeholder="कैप्शन"
+              className="mt-1 w-full rounded border border-gray-300 px-2 py-1 text-xs"
+            />
+          ) : (
+            image.caption && (
+              <div style={{ fontStyle: "italic", fontSize: "0.7em", marginTop: "0.5mm" }}>
+                {image.caption}
+              </div>
+            )
           )}
 
           {editing && (
@@ -252,6 +274,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
         }}
       >
         {block.body}
+      </div>
       </div>
     </div>
   );

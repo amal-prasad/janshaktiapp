@@ -24,7 +24,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<AdBlock>) {
   // canvas is WYSIWYG. ImagePicker is controls-only (upload / caption / dpi) and
   // no longer previews the photo, so there is exactly one copy on screen.
   const body = block.image ? (
-    <div style={{ width: "100%", height: block.heightMm ? `${block.heightMm}mm` : undefined }}>
+    <div style={{ width: "100%", height: block.heightMm ? `${block.heightMm}mm` : undefined, overflow: "hidden" }}>
       <img
         src={block.image.url}
         alt=""

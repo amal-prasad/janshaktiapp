@@ -63,23 +63,11 @@ export default function ImagePicker({ editionId, image, onChange, placedMm }: Pr
 
       {error && <div className="mt-1 text-xs text-red-600">{error}</div>}
 
-      {image && (
-        <>
-          <input
-            type="text"
-            value={image.caption ?? ""}
-            onChange={(e) => onChange({ ...image, caption: e.target.value })}
-            placeholder="कैप्शन"
-            className="mt-2 w-full rounded border border-gray-300 px-2 py-1 text-xs"
-          />
-
-          {verdict && !verdict.ok && (
-            <div className="mt-2 rounded bg-amber-100 px-2 py-1 text-xs text-amber-800">
-              चेतावनी: यह फ़ोटो केवल {verdict.dpi} dpi पर छपेगी। कम से कम {verdict.needed} पिक्सेल
-              चौड़ी फ़ोटो चाहिए।
-            </div>
-          )}
-        </>
+      {image && verdict && !verdict.ok && (
+        <div className="mt-2 rounded bg-amber-100 px-2 py-1 text-xs text-amber-800">
+          चेतावनी: यह फ़ोटो केवल {verdict.dpi} dpi पर छपेगी। कम से कम {verdict.needed} पिक्सेल
+          चौड़ी फ़ोटो चाहिए।
+        </div>
       )}
     </div>
   );
