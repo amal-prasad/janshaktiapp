@@ -38,7 +38,7 @@ export default async function PrintPage({
           padding: 0; 
           background: #fff; 
         }
-        * {
+        html {
           -webkit-print-color-adjust: exact !important; 
           print-color-adjust: exact !important; 
         }
