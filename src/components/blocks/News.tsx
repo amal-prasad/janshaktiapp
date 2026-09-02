@@ -29,7 +29,8 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
   };
 
   const image = block.image;
-  const wrapping = image?.float === "left" || image?.float === "right";
+  const imgFloat = image?.float ?? "left";
+  const wrapping = imgFloat === "left" || imgFloat === "right";
   const blockHeightMm = block.heightMm ?? 90;
   // image.heightMm can outlive a block resize (dragged before heightMm shrank the
   // box) -- clamp so `cover` never zooms into a crop taller than what's shown.
@@ -176,11 +177,11 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
             position: "relative",
             width: `${initialWidthPct}%`,
             float:
-              image.float === "left" ? "left" : image.float === "right" ? "right" : "none",
-            columnSpan: (!image.float || image.float === "full") ? "all" : "none",
-            marginRight: image.float === "left" ? "3mm" : undefined,
-            marginLeft: image.float === "right" ? "3mm" : undefined,
-            marginBottom: image.float === "left" || image.float === "right" ? "1mm" : "2mm",
+              imgFloat === "left" ? "left" : imgFloat === "right" ? "right" : "none",
+            columnSpan: imgFloat === "full" ? "all" : "none",
+            marginRight: imgFloat === "left" ? "3mm" : undefined,
+            marginLeft: imgFloat === "right" ? "3mm" : undefined,
+            marginBottom: wrapping ? "1mm" : "2mm",
             touchAction: editing ? "none" : undefined,
             cursor: editing ? "crosshair" : undefined,
             userSelect: editing ? "none" : undefined,
@@ -344,7 +345,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           hyphens: "none",
           fontSize: "0.95em",
           lineHeight: 1.4,
-          textAlign: "justify",
+          textAlign: "left",
         }}
       >
         {block.body}
