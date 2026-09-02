@@ -176,11 +176,10 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           style={{
             position: "relative",
             width: `${initialWidthPct}%`,
-            float:
-              imgFloat === "left" ? "left" : imgFloat === "right" ? "right" : "none",
+            float: imgFloat === "left" ? "left" : imgFloat === "right" ? "right" : "none",
             columnSpan: imgFloat === "full" ? "all" : "none",
-            marginRight: imgFloat === "left" ? "3mm" : undefined,
-            marginLeft: imgFloat === "right" ? "3mm" : undefined,
+            marginRight: imgFloat === "left" ? "3mm" : imgFloat === "center" ? "auto" : undefined,
+            marginLeft: imgFloat === "right" ? "3mm" : imgFloat === "center" ? "auto" : undefined,
             marginBottom: 0,
             breakInside: "avoid",
             pageBreakInside: "avoid",
@@ -255,21 +254,30 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
               >
                 <button
                   type="button"
-                  className="rounded bg-white px-1 text-xs shadow"
+                  className={`rounded px-1 text-xs shadow ${imgFloat === "left" ? "bg-blue-200" : "bg-white"}`}
                   onClick={() => onChange({ ...block, image: { ...image, float: "left" } })}
                 >
                   बाएँ
                 </button>
+                {block.columns === 3 && (
+                  <button
+                    type="button"
+                    className={`rounded px-1 text-xs shadow ${imgFloat === "center" ? "bg-blue-200" : "bg-white"}`}
+                    onClick={() => onChange({ ...block, image: { ...image, float: "center" } })}
+                  >
+                    बीच
+                  </button>
+                )}
                 <button
                   type="button"
-                  className="rounded bg-white px-1 text-xs shadow"
+                  className={`rounded px-1 text-xs shadow ${imgFloat === "right" ? "bg-blue-200" : "bg-white"}`}
                   onClick={() => onChange({ ...block, image: { ...image, float: "right" } })}
                 >
                   दाएँ
                 </button>
                 <button
                   type="button"
-                  className="rounded bg-white px-1 text-xs shadow"
+                  className={`rounded px-1 text-xs shadow ${imgFloat === "full" ? "bg-blue-200" : "bg-white"}`}
                   onClick={() => onChange({ ...block, image: { ...image, float: "full" } })}
                 >
                   पूरा

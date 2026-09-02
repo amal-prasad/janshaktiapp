@@ -34,7 +34,7 @@ export type ImageRef = {
   /** fixed placed height in mm. undefined = auto from the source aspect ratio */
   heightMm?: number;
   /** how body text sits against the photo. undefined = "full" (photo above, no wrap) */
-  float?: "left" | "right" | "full";
+  float?: "left" | "right" | "full" | "center";
 };
 
 type Base = { id: string };
