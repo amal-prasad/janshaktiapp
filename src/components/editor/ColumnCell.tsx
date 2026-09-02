@@ -59,7 +59,7 @@ export default function ColumnCell({
         return (
           <div
             key={b.id}
-            className={`group relative border border-gray-300 p-2 ${
+            className={`group relative ${
               editing && b.id === selectedBlockId ? "ring-2 ring-blue-500" : ""
             }`}
             onClick={() => editing && onSelectBlock?.(b.id)}
