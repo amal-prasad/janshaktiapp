@@ -33,6 +33,9 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
   // image.heightMm can outlive a block resize (dragged before heightMm shrank the
   // box) -- clamp so `cover` never zooms into a crop taller than what's shown.
   const imgHeightMm = image?.heightMm ? Math.min(image.heightMm, blockHeightMm) : undefined;
+  
+  const defaultWidthPct = (25.4 / Math.max(placedMm, 1)) * 100;
+  const initialWidthPct = image?.widthPct ?? Math.min(100, defaultWidthPct);
 
   const setFocalFromEvent = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!image) return;
@@ -53,7 +56,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
     resizeRef.current = {
       x: e.clientX,
       y: e.clientY,
-      widthPct: image.widthPct ?? 100,
+      widthPct: initialWidthPct,
       heightMm: image.heightMm ?? el.getBoundingClientRect().height / (MM_TO_PX * zoom),
     };
     const onMove = (ev: PointerEvent) => {
@@ -87,15 +90,30 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
   return (
     <div style={{ width: "100%" }}>
       {editing && (
-        <label className="mb-1 block text-xs text-gray-600">
-          ऊँचाई (मिमी){" "}
-          <input
-            type="number"
-            className="w-20 rounded border border-gray-300 px-1 text-xs"
-            value={block.heightMm ?? 90}
-            onChange={(e) => onChange({ ...block, heightMm: Number(e.target.value) || 90 })}
-          />
-        </label>
+        <div className="flex gap-4 mb-1">
+          <label className="block text-xs text-gray-600">
+            ऊँचाई (मिमी){" "}
+            <input
+              type="number"
+              className="w-16 rounded border border-gray-300 px-1 text-xs"
+              value={block.heightMm ?? 90}
+              onChange={(e) => onChange({ ...block, heightMm: Number(e.target.value) || 90 })}
+            />
+          </label>
+          <label className="block text-xs text-gray-600">
+            कॉलम{" "}
+            <select
+              className="rounded border border-gray-300 px-1 text-xs"
+              value={block.columns ?? (wrapping ? 1 : 2)}
+              onChange={(e) => onChange({ ...block, columns: Number(e.target.value) })}
+            >
+              <option value={1}>1</option>
+              <option value={2}>2</option>
+              <option value={3}>3</option>
+              <option value={4}>4</option>
+            </select>
+          </label>
+        </div>
       )}
       <div style={{ position: "relative", height: `${block.heightMm ?? 90}mm`, overflow: "hidden" }}>
       <div
@@ -131,14 +149,21 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
         />
       )}
 
+      <div
+        style={{
+          columnCount: block.columns ?? (wrapping ? 1 : 2),
+          columnGap: "4mm",
+        }}
+      >
       {image && (
         <div
           ref={figureRef}
           style={{
             position: "relative",
-            width: `${image.widthPct ?? 100}%`,
+            width: `${initialWidthPct}%`,
             float:
               image.float === "left" ? "left" : image.float === "right" ? "right" : "none",
+            columnSpan: (!image.float || image.float === "full") ? "all" : "none",
             marginRight: image.float === "left" ? "3mm" : undefined,
             marginLeft: image.float === "right" ? "3mm" : undefined,
             marginBottom: image.float === "left" || image.float === "right" ? "1mm" : "2mm",
@@ -299,8 +324,6 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           editing && onChange({ ...block, body: e.currentTarget.textContent ?? "" })
         }
         style={{
-          columnCount: wrapping ? 1 : 2,
-          columnGap: "4mm",
           hyphens: "none",
           fontSize: "0.95em",
           lineHeight: 1.4,
@@ -308,6 +331,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
         }}
       >
         {block.body}
+      </div>
       </div>
 
       {editing && (

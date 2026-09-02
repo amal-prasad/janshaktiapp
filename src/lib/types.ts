@@ -49,6 +49,8 @@ export type NewsBlock = Base & {
   headlineScale?: number;
   /** fixed block height in mm; body text clips at this, doesn't push page. undefined = 90mm */
   heightMm?: number;
+  /** number of text columns. undefined defaults to 1 or 2 based on wrapping */
+  columns?: number;
 };
 
 export type AdBlock = Base & {
