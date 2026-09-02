@@ -104,8 +104,8 @@ const janshaktiFields = [
   { key: "leftBoxText", label: "बायाँ बॉक्स - टेक्स्ट", default: "" },
   { key: "rightBoxImage", label: "दायाँ बॉक्स - चित्र", default: "" },
   { key: "rightBoxText", label: "दायाँ बॉक्स - टेक्स्ट", default: "" },
-  { key: "year", label: "वर्ष", default: "" },
-  { key: "issue", label: "अंक", default: "" },
+  { key: "year", label: "वर्ष", default: "1" },
+  { key: "issue", label: "अंक", default: "1" },
   { key: "frequency", label: "आवृत्ति", default: "(प्रति सोमवार)" },
   { key: "datePlace", label: "स्थान और दिनांक", default: "इंदौर, 24 अगस्त से 30 अगस्त 2026" },
   { key: "pages", label: "पेज", default: "8" },
@@ -113,41 +113,55 @@ const janshaktiFields = [
 ];
 
 /** Exact Janshakti masthead: bordered image box left, logo+tagline centred, mirrored box right. */
-const Janshakti = ({ fields, color }: SlotRenderProps) => (
-  <div style={{ width: "100%", fontFamily: "sans-serif", color: "#111" }}>
-    <div style={{ display: "flex", alignItems: "stretch", justifyContent: "space-between", gap: "3mm", padding: "1.5mm 2mm" }}>
-      <div style={{ flex: "0 0 45mm", border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column" }}>
-        {fields.leftBoxImage && <img src={fields.leftBoxImage} style={{ maxWidth: "100%", maxHeight: "25mm", objectFit: "contain", margin: "0 auto 1mm auto" }} alt="" />}
-        {fields.leftBoxText && <div style={{ whiteSpace: "pre-wrap", backgroundColor: "#b3151b", color: "#fff", fontWeight: "bold", padding: "3px", width: "100%", marginTop: "auto" }}>{fields.leftBoxText}</div>}
+const Janshakti = ({ fields, color }: SlotRenderProps) => {
+  const onBoxClick = () => {
+    alert("कृपया हेडर को दाईं ओर 'हेडर' टैब से संपादित करें।");
+  };
+
+  return (
+    <div style={{ width: "100%", fontFamily: "sans-serif", color: "#111" }}>
+      <div style={{ display: "flex", alignItems: "stretch", justifyContent: "space-between", gap: "3mm", padding: "1mm 2mm" }}>
+        <div onClick={onBoxClick} style={{ cursor: "pointer", flex: "0 0 45mm", border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column" }}>
+          {fields.leftBoxImage ? (
+            <img src={fields.leftBoxImage} style={{ maxWidth: "100%", maxHeight: "25mm", objectFit: "contain", margin: "0 auto 1mm auto" }} alt="" />
+          ) : !fields.leftBoxText ? (
+            <div style={{ margin: "auto", color: "#aaa" }}>चित्र या टेक्स्ट जोड़ें</div>
+          ) : null}
+          {fields.leftBoxText && <div style={{ whiteSpace: "pre-wrap", backgroundColor: "#b3151b", color: "#fff", fontWeight: "bold", padding: "3px", width: "100%", marginTop: "auto" }}>{fields.leftBoxText}</div>}
+        </div>
+        <div style={{ textAlign: "center", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+          {fields.weeklyLabel && (
+            <div style={{ alignSelf: "flex-start", marginLeft: "10%", fontSize: "1.1em", fontWeight: 700 }}>{fields.weeklyLabel}</div>
+          )}
+          <img src="/logo.png" alt={fields.newspaperName} style={{ width: "100%", height: "auto", maxHeight: "35mm", objectFit: "contain" }} />
+          <div style={{ fontSize: "1.05em", fontWeight: 700, margin: "1mm 0 0" }}>{fields.tagline}</div>
+        </div>
+        <div onClick={onBoxClick} style={{ cursor: "pointer", flex: "0 0 45mm", border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column" }}>
+          {fields.rightBoxImage ? (
+            <img src={fields.rightBoxImage} style={{ maxWidth: "100%", maxHeight: "25mm", objectFit: "contain", margin: "0 auto 1mm auto" }} alt="" />
+          ) : !fields.rightBoxText ? (
+            <div style={{ margin: "auto", color: "#aaa" }}>चित्र या टेक्स्ट जोड़ें</div>
+          ) : null}
+          {fields.rightBoxText && <div style={{ whiteSpace: "pre-wrap", backgroundColor: "#b3151b", color: "#fff", fontWeight: "bold", padding: "3px", width: "100%", marginTop: "auto" }}>{fields.rightBoxText}</div>}
+        </div>
       </div>
-      <div style={{ textAlign: "center", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-        {fields.weeklyLabel && (
-          <div style={{ alignSelf: "flex-start", marginLeft: "10%", fontSize: "1.1em", fontWeight: 700 }}>{fields.weeklyLabel}</div>
-        )}
-        <img src="/logo.png" alt={fields.newspaperName} style={{ width: "100%", height: "auto", maxHeight: "60mm", objectFit: "contain" }} />
-        <div style={{ fontSize: "1.05em", fontWeight: 700, margin: "1mm 0 0" }}>{fields.tagline}</div>
-      </div>
-      <div style={{ flex: "0 0 45mm", border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column" }}>
-        {fields.rightBoxImage && <img src={fields.rightBoxImage} style={{ maxWidth: "100%", maxHeight: "25mm", objectFit: "contain", margin: "0 auto 1mm auto" }} alt="" />}
-        {fields.rightBoxText && <div style={{ whiteSpace: "pre-wrap", backgroundColor: "#b3151b", color: "#fff", fontWeight: "bold", padding: "3px", width: "100%", marginTop: "auto" }}>{fields.rightBoxText}</div>}
+      <div style={{ background: "#0b4a8f", color: "#fff", padding: "1.2mm 3mm", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.78em", fontWeight: 700 }}>
+        <div style={{ display: "flex", gap: "8mm" }}>
+          <span>वर्ष : {fields.year}</span>
+          <span>अंक : {fields.issue}</span>
+          <span>{fields.frequency}</span>
+        </div>
+        <div style={{ letterSpacing: "0.02em" }}>
+          {fields.datePlace}
+        </div>
+        <div style={{ display: "flex", gap: "8mm" }}>
+          <span>पेज : {fields.pages}</span>
+          <span>मूल्य : {fields.price}</span>
+        </div>
       </div>
     </div>
-    <div style={{ background: color || "#0b4a8f", color: "#fff", padding: "1.2mm 3mm", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.78em", fontWeight: 700 }}>
-      <div style={{ display: "flex", gap: "8mm" }}>
-        <span>वर्ष : {fields.year}</span>
-        <span>अंक : {fields.issue}</span>
-        <span>{fields.frequency}</span>
-      </div>
-      <div style={{ letterSpacing: "0.02em" }}>
-        {fields.datePlace}
-      </div>
-      <div style={{ display: "flex", gap: "8mm" }}>
-        <span>पेज : {fields.pages}</span>
-        <span>मूल्य : {fields.price}</span>
-      </div>
-    </div>
-  </div>
-);
+  );
+};
 
 export const headerTemplates: SlotTemplate[] = [
   { id: "classic", slot: "header", label: "क्लासिक केंद्रित", fields: commonFields, Render: Classic },
