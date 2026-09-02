@@ -4,6 +4,7 @@ import type { EditionDoc, HeaderSlot, SlotConfig } from "@/lib/types";
 import { setSlot } from "@/lib/edition";
 import { SLOT_COLORS } from "./registry";
 import { templatesFor, findTemplate } from "./index";
+import ImagePicker from "../editor/ImagePicker";
 
 const SLOT_TABS: { slot: HeaderSlot; label: string }[] = [
   { slot: "header", label: "हेडर" },
@@ -92,17 +93,29 @@ export default function SlotPicker({ editionId, edition }: { editionId: string; 
 
       {template && (
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-          {template.fields.map((f) => (
-            <label key={f.key} style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              <span style={{ fontSize: "11px", color: "#555" }}>{f.label}</span>
-              <input
-                type="text"
-                value={config.fields[f.key] ?? f.default}
-                onChange={(e) => patch({ fields: { ...config.fields, [f.key]: e.target.value } })}
-                style={{ padding: "4px 6px", border: "1px solid #ccc", borderRadius: "3px" }}
-              />
-            </label>
-          ))}
+          {template.fields.map((f) => {
+            const isImage = f.key.toLowerCase().includes("image");
+            return (
+              <label key={f.key} style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                <span style={{ fontSize: "11px", color: "#555" }}>{f.label}</span>
+                {isImage ? (
+                  <ImagePicker
+                    editionId={editionId}
+                    image={config.fields[f.key] ? { url: config.fields[f.key], naturalW: 1000, naturalH: 1000, storagePath: "", focalX: 0.5, focalY: 0.5 } : undefined}
+                    onChange={(next: any) => patch({ fields: { ...config.fields, [f.key]: next?.url ?? "" } })}
+                    placedMm={45}
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={config.fields[f.key] ?? f.default}
+                    onChange={(e) => patch({ fields: { ...config.fields, [f.key]: e.target.value } })}
+                    style={{ padding: "4px 6px", border: "1px solid #ccc", borderRadius: "3px" }}
+                  />
+                )}
+              </label>
+            );
+          })}
         </div>
       )}
     </div>
