@@ -130,7 +130,6 @@ export default function PageCanvas({
           >
             {pageIndex === 0 && <SlotRender slot="header" config={slots.header} />}
             {pageIndex === 0 && <SlotRender slot="header2" config={slots.header2} />}
-            {pageIndex === 0 && <SlotRender slot="subheader" config={slots.subheader} />}
 
             {rows.map((row) => (
               <RowView
@@ -143,8 +142,6 @@ export default function PageCanvas({
                 onSelectBlock={onSelectBlock}
               />
             ))}
-
-            <SlotRender slot="footer" config={slots.footer} />
           </div>
         </div>
       </div>

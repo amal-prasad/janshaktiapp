@@ -46,11 +46,9 @@ export default async function PrintPage({
           >
             {page.index === 0 && <SlotRender slot="header" config={edition.slots.header} />}
             {page.index === 0 && <SlotRender slot="header2" config={edition.slots.header2} />}
-            {page.index === 0 && <SlotRender slot="subheader" config={edition.slots.subheader} />}
             {page.rows.map((row) => (
               <RowView key={row.id} row={row} editionId={edition.id} pageWmm={w} />
             ))}
-            <SlotRender slot="footer" config={edition.slots.footer} />
           </div>
         ))}
       </div>
