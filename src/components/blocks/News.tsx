@@ -5,15 +5,11 @@ import type { NewsBlock } from "@/lib/types";
 import type { BlockDef, BlockRenderProps } from "@/components/blocks/registry";
 import { newId } from "@/lib/ids";
 import { usePrintContext } from "@/components/editor/printContext";
-import dynamic from "next/dynamic";
-// Loaded only in the browser, only while editing: ImagePicker pulls in the
-// Firebase client SDK, and this component is server-rendered by /print.
-const ImagePicker = dynamic(() => import("@/components/editor/ImagePicker"), { ssr: false });
 
 const MM_TO_PX = 96 / 25.4; // ponytail: same conversion as PageCanvas.tsx, not exported there
 
 function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
-  const { editionId, placedMm } = usePrintContext();
+  const { placedMm } = usePrintContext();
   const figureRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const columnWrapRef = useRef<HTMLDivElement>(null);
@@ -110,32 +106,6 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
 
   return (
     <div style={{ width: "100%" }}>
-      {editing && (
-        <div className="flex gap-4 mb-1">
-          <label className="block text-xs text-gray-600">
-            ऊँचाई (मिमी){" "}
-            <input
-              type="number"
-              className="w-16 rounded border border-gray-300 px-1 text-xs"
-              value={block.heightMm ?? 90}
-              onChange={(e) => onChange({ ...block, heightMm: Number(e.target.value) || 90 })}
-            />
-          </label>
-          <label className="block text-xs text-gray-600">
-            कॉलम{" "}
-            <select
-              className="rounded border border-gray-300 px-1 text-xs"
-              value={block.columns ?? (wrapping ? 1 : 2)}
-              onChange={(e) => onChange({ ...block, columns: Number(e.target.value) })}
-            >
-              <option value={1}>1</option>
-              <option value={2}>2</option>
-              <option value={3}>3</option>
-              <option value={4}>4</option>
-            </select>
-          </label>
-        </div>
-      )}
       <div
         style={{ position: "relative", display: "flex", flexDirection: "column", height: `${block.heightMm ?? 90}mm`, overflow: "hidden" }}
         onClick={(e) => {
@@ -185,15 +155,6 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
         >
           {block.byline}
         </div>
-      )}
-
-      {editing && (
-        <ImagePicker
-          editionId={editionId}
-          image={block.image}
-          placedMm={placedMm}
-          onChange={(next) => onChange({ ...block, image: next })}
-        />
       )}
 
       <div
@@ -258,20 +219,10 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
               objectPosition: `${image.focalX * 100}% ${image.focalY * 100}%`,
             }}
           />
-          {editing ? (
-            <input
-              type="text"
-              value={image.caption ?? ""}
-              onChange={(e) => onChange({ ...block, image: { ...image, caption: e.target.value } })}
-              placeholder="कैप्शन"
-              className="mt-1 w-full rounded border border-gray-300 px-2 py-1 text-xs"
-            />
-          ) : (
-            image.caption && (
-              <div style={{ fontStyle: "italic", fontSize: "0.7em", marginTop: "0.5mm" }}>
-                {image.caption}
-              </div>
-            )
+          {image.caption && (
+            <div style={{ fontStyle: "italic", fontSize: "0.7em", marginTop: "0.5mm" }}>
+              {image.caption}
+            </div>
           )}
 
           {editing && (

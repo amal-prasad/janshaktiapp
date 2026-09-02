@@ -5,6 +5,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { newId } from "@/lib/ids";
+import { demoRows } from "@/lib/demoContent";
 import { DEFAULT_PAGE_SIZE, type EditionDoc, type HeaderSlot, type PageDoc, type Row, type SlotConfig } from "@/lib/types";
 
 const editionsCol = () => collection(db, "editions");
@@ -37,7 +38,7 @@ export async function createEdition(uid: string, title: string, date: string): P
           ...blankPage(i),
           rows: [{ id: newId(), cols: [{ id: newId(), span: 12, blocks: [{ id: newId(), type: "ad" as const, heightMm: 430 }] }] }],
         }
-      : blankPage(i);
+      : { ...blankPage(i), rows: demoRows(i) };
     batch.set(doc(pagesCol(ref.id), newId()), page);
   }
   await batch.commit();
