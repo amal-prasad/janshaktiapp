@@ -61,7 +61,7 @@ function ResizableImage({
           height: heightMm ? `${heightMm}mm` : "auto",
           maxWidth: "100%",
           maxHeight: heightMm ? "none" : "25mm",
-          objectFit: "contain",
+          objectFit: heightMm ? "cover" : "contain",
           display: "block",
         }}
         alt=""
@@ -209,7 +209,7 @@ const Janshakti = ({ fields, color, editing, onChange }: SlotRenderProps) => {
   return (
     <div style={{ width: "100%", fontFamily: "sans-serif", color: "#111" }}>
       <div style={{ display: "flex", alignItems: "stretch", justifyContent: "space-between", gap: "3mm", padding: "1mm 2mm" }}>
-        <div onClick={onBoxClick} style={{ flex: "0 0 45mm", border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column" }}>
+        <div onClick={onBoxClick} style={{ flex: `0 0 ${fields.leftBoxImageWidth ?? "45"}mm`, border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column", overflow: "hidden" }}>
           {fields.leftBoxImage ? (
             <ResizableImage 
               src={fields.leftBoxImage} 
@@ -253,7 +253,7 @@ const Janshakti = ({ fields, color, editing, onChange }: SlotRenderProps) => {
             {fields.tagline}
           </div>
         </div>
-        <div onClick={onBoxClick} style={{ flex: "0 0 45mm", border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column" }}>
+        <div onClick={onBoxClick} style={{ flex: `0 0 ${fields.rightBoxImageWidth ?? "45"}mm`, border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column", overflow: "hidden" }}>
           {fields.rightBoxImage ? (
             <ResizableImage 
               src={fields.rightBoxImage} 
