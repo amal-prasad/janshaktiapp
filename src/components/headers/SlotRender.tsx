@@ -1,3 +1,4 @@
+"use client";
 import type { HeaderSlot, SlotConfig } from "@/lib/types";
 import { findTemplate } from "./index";
 
