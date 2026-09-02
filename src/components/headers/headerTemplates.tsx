@@ -133,7 +133,7 @@ const Janshakti = ({ fields, color }: SlotRenderProps) => {
           {fields.weeklyLabel && (
             <div style={{ alignSelf: "flex-start", marginLeft: "10%", fontSize: "1.1em", fontWeight: 700 }}>{fields.weeklyLabel}</div>
           )}
-          <img src="/logo.png" alt={fields.newspaperName} style={{ width: "100%", height: "auto", maxHeight: "35mm", objectFit: "contain" }} />
+          <img src="/logo.png?v=3" alt={fields.newspaperName} style={{ width: "100%", height: "auto", maxHeight: "45mm", objectFit: "contain" }} />
           <div style={{ fontSize: "1.05em", fontWeight: 700, margin: "1mm 0 0" }}>{fields.tagline}</div>
         </div>
         <div onClick={onBoxClick} style={{ cursor: "pointer", flex: "0 0 45mm", border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column" }}>
