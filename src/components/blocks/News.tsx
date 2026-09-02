@@ -15,6 +15,7 @@ const MM_TO_PX = 96 / 25.4; // ponytail: same conversion as PageCanvas.tsx, not 
 function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
   const { editionId, placedMm } = usePrintContext();
   const figureRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   const draggingFocalRef = useRef(false);
   const resizeRef = useRef<{ x: number; y: number; widthPct: number; heightMm: number } | null>(
     null
@@ -115,7 +116,14 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           </label>
         </div>
       )}
-      <div style={{ position: "relative", height: `${block.heightMm ?? 90}mm`, overflow: "hidden" }}>
+      <div 
+        style={{ position: "relative", height: `${block.heightMm ?? 90}mm`, overflow: "hidden" }}
+        onClick={(e) => {
+          if (editing && e.target === e.currentTarget && bodyRef.current) {
+            bodyRef.current.focus();
+          }
+        }}
+      >
       <div
         contentEditable={editing}
         suppressContentEditableWarning
@@ -153,6 +161,12 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
         style={{
           columnCount: block.columns ?? (wrapping ? 1 : 2),
           columnGap: "4mm",
+          height: "100%", // Ensures the column wrapper spans available height to make it clickable
+        }}
+        onClick={(e) => {
+          if (editing && e.target === e.currentTarget && bodyRef.current) {
+            bodyRef.current.focus();
+          }
         }}
       >
       {image && (
@@ -318,12 +332,15 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
       )}
 
       <div
+        ref={bodyRef}
         contentEditable={editing}
         suppressContentEditableWarning
         onBlur={(e) =>
           editing && onChange({ ...block, body: e.currentTarget.textContent ?? "" })
         }
+        className="empty:before:content-['यहाँ_टेक्स्ट_लिखें...'] empty:before:text-gray-400 focus:outline-none"
         style={{
+          minHeight: "2em",
           hyphens: "none",
           fontSize: "0.95em",
           lineHeight: 1.4,
