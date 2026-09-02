@@ -13,7 +13,7 @@ const commonFields = [
 function Logo({ logoUrl, name, janshakti }: { logoUrl?: string; name: string; janshakti?: boolean }) {
   const finalLogoUrl = janshakti ? "/logo.png?v=2" : logoUrl;
   if (finalLogoUrl) {
-    return <img src={finalLogoUrl} alt={name} style={{ height: janshakti ? "35mm" : "14mm", maxWidth: "100%", objectFit: "contain" }} />;
+    return <img src={finalLogoUrl} alt={name} style={{ height: janshakti ? "48mm" : "14mm", maxWidth: "100%", objectFit: "contain" }} />;
   }
   return null;
 }
@@ -99,11 +99,9 @@ const BoxedMinimal = ({ fields, color, logoUrl }: SlotRenderProps) => (
 const janshaktiFields = [
   ...commonFields,
   { key: "leftBoxImage", label: "बायाँ बॉक्स - चित्र", default: "" },
-  { key: "leftBox1", label: "बायाँ बॉक्स - पंक्ति 1", default: "" },
-  { key: "leftBox2", label: "बायाँ बॉक्स - पंक्ति 2", default: "" },
+  { key: "leftBoxText", label: "बायाँ बॉक्स - टेक्स्ट", default: "" },
   { key: "rightBoxImage", label: "दायाँ बॉक्स - चित्र", default: "" },
-  { key: "rightBox1", label: "दायाँ बॉक्स - पंक्ति 1", default: "" },
-  { key: "rightBox2", label: "दायाँ बॉक्स - पंक्ति 2", default: "" },
+  { key: "rightBoxText", label: "दायाँ बॉक्स - टेक्स्ट", default: "" },
 ];
 
 /** Three-column masthead: bordered info box left, logo/name/tagline centred, mirrored box right. */
@@ -112,8 +110,7 @@ const Janshakti = ({ fields, color, logoUrl }: SlotRenderProps) => (
     <div style={{ display: "flex", alignItems: "stretch", justifyContent: "space-between", gap: "3mm", padding: "1.5mm 1mm" }}>
       <div style={{ flex: "0 0 45mm", border: `1pt solid ${color}`, padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center", minHeight: "20mm" }}>
         {fields.leftBoxImage && <img src={fields.leftBoxImage} style={{ maxWidth: "100%", maxHeight: "25mm", objectFit: "contain", margin: "0 auto 1mm auto" }} alt="" />}
-        <div>{fields.leftBox1}</div>
-        <div>{fields.leftBox2}</div>
+        {fields.leftBoxText && <div style={{ whiteSpace: "pre-wrap" }}>{fields.leftBoxText}</div>}
       </div>
       <div style={{ textAlign: "center", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
         <Logo logoUrl={logoUrl} name={fields.newspaperName} janshakti={true} />
@@ -124,8 +121,7 @@ const Janshakti = ({ fields, color, logoUrl }: SlotRenderProps) => (
       </div>
       <div style={{ flex: "0 0 45mm", border: `1pt solid ${color}`, padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center", minHeight: "20mm" }}>
         {fields.rightBoxImage && <img src={fields.rightBoxImage} style={{ maxWidth: "100%", maxHeight: "25mm", objectFit: "contain", margin: "0 auto 1mm auto" }} alt="" />}
-        <div>{fields.rightBox1}</div>
-        <div>{fields.rightBox2}</div>
+        {fields.rightBoxText && <div style={{ whiteSpace: "pre-wrap" }}>{fields.rightBoxText}</div>}
       </div>
     </div>
     <div style={{ borderBottom: `2pt solid ${color}` }} />
