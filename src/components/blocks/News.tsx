@@ -182,6 +182,8 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
             marginRight: imgFloat === "left" ? "3mm" : undefined,
             marginLeft: imgFloat === "right" ? "3mm" : undefined,
             marginBottom: wrapping ? "1mm" : "2mm",
+            breakInside: "avoid",
+            pageBreakInside: "avoid",
             touchAction: editing ? "none" : undefined,
             cursor: editing ? "crosshair" : undefined,
             userSelect: editing ? "none" : undefined,
