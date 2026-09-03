@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import RowView, { type RowOps } from "@/components/RowView";
 import SlotRender from "@/components/headers/SlotRender";
+import InnerPageHeader from "@/components/headers/InnerPageHeader";
 import { addBlock, moveBlock, removeBlock, updateBlock } from "@/components/editor/rowOps";
 import { setSlot } from "@/lib/edition";
 import type { HeaderSlot, PageSizeMm, Row, SlotConfig } from "@/lib/types";
@@ -131,6 +132,7 @@ export default function PageCanvas({
           >
             {pageIndex === 0 && <SlotRender slot="header" config={slots.header} editing={!readOnly} onChange={(config) => setSlot(editionId, "header", config)} />}
             {pageIndex === 0 && <SlotRender slot="header2" config={slots.header2} editing={!readOnly} onChange={(config) => setSlot(editionId, "header2", config)} />}
+            {pageIndex > 0 && <InnerPageHeader pageIndex={pageIndex} datePlace={slots.header?.fields?.datePlace} />}
 
             {rows.map((row) => (
               <RowView

@@ -3,6 +3,7 @@ import SlotRender from "@/components/headers/SlotRender";
 import { loadForPrint, verifyToken } from "@/lib/admin";
 import type { PageDoc } from "@/lib/types";
 import RowView from "@/components/RowView";
+import InnerPageHeader from "@/components/headers/InnerPageHeader";
 import AutoPrint from "@/components/AutoPrint";
 
 // Fully server-rendered: no hydration race for headless Chromium to lose.
@@ -54,6 +55,7 @@ export default async function PrintPage({
           >
             {page.index === 0 && <SlotRender slot="header" config={edition.slots.header} />}
             {page.index === 0 && <SlotRender slot="header2" config={edition.slots.header2} />}
+            {page.index > 0 && <InnerPageHeader pageIndex={page.index} datePlace={edition.slots.header?.fields?.datePlace} />}
             {page.rows.map((row) => (
               <RowView key={row.id} row={row} editionId={edition.id} pageWmm={w} />
             ))}
