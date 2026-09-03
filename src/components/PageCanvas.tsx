@@ -130,6 +130,19 @@ export default function PageCanvas({
               } as React.CSSProperties
             }
           >
+            {/* Printable Area Visual Guide */}
+            {!readOnly && (
+              <div 
+                style={{ 
+                  position: "absolute", 
+                  inset: "0.5in", 
+                  border: "1px dashed rgba(59, 130, 246, 0.4)", 
+                  pointerEvents: "none",
+                  zIndex: 50 
+                }} 
+              />
+            )}
+
             {pageIndex === 0 && <SlotRender slot="header" config={slots.header} editing={!readOnly} onChange={(config) => setSlot(editionId, "header", config)} />}
             {pageIndex === 0 && <SlotRender slot="header2" config={slots.header2} editing={!readOnly} onChange={(config) => setSlot(editionId, "header2", config)} />}
             {pageIndex > 0 && <InnerPageHeader pageIndex={pageIndex} datePlace={slots.header?.fields?.datePlace} />}

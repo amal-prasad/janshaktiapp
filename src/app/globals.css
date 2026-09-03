@@ -16,7 +16,8 @@ body {
   color: #000;
   width: var(--page-w);
   height: var(--page-h);
-  padding: 12.7mm;
+  padding: 0.5in;
   box-sizing: border-box;
   overflow: hidden;
+  position: relative;
 }

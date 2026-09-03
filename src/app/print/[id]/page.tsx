@@ -38,12 +38,16 @@ export default async function PrintPage({
           margin: 0; 
           padding: 0; 
           background: #fff; 
+          min-height: 100vh;
         }
         html {
           -webkit-print-color-adjust: exact !important; 
           print-color-adjust: exact !important; 
         }
-        .print-sheet { break-after: page; page-break-after: always; }
+        .print-sheet { 
+          break-after: page; 
+          page-break-after: always; 
+        }
         .print-sheet:last-child { break-after: auto; page-break-after: auto; }
       `}</style>
       <div data-page-w={w} data-page-h={h} id="print-root">
