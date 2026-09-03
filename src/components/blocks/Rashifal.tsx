@@ -23,11 +23,9 @@ function Render({ block, editing, onChange }: BlockRenderProps<RashifalBlock>) {
           fontWeight: 700,
           fontSize: "1.05em",
           padding: "1mm 2mm",
-          whiteSpace: "pre-wrap",
         }}
-      >
-        {block.title}
-      </div>
+        dangerouslySetInnerHTML={{ __html: (block.title || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
+      />
       <div
         style={{
           display: "grid",
@@ -43,10 +41,9 @@ function Render({ block, editing, onChange }: BlockRenderProps<RashifalBlock>) {
               contentEditable={editing}
               suppressContentEditableWarning
               onBlur={(e) => editing && setText(i, e.currentTarget.innerText ?? "")}
-              style={{ fontSize: "0.78em", lineHeight: 1.3, whiteSpace: "pre-wrap" }}
-            >
-              {sign.text}
-            </div>
+              style={{ fontSize: "0.78em", lineHeight: 1.3 }}
+              dangerouslySetInnerHTML={{ __html: (sign.text || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
+            />
           </div>
         ))}
       </div>

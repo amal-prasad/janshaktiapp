@@ -111,11 +111,9 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
             fontWeight: 700,
             fontSize: `${1.1 * (block.headlineScale ?? 1)}em`,
             marginBottom: "0.5mm",
-            whiteSpace: "pre-wrap",
           }}
-        >
-          {block.subhead}
-        </div>
+          dangerouslySetInnerHTML={{ __html: (block.subhead || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
+        />
       )}
 
       <div
@@ -124,10 +122,9 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
         onBlur={(e) =>
           editing && onChange({ ...block, headline: e.currentTarget.innerText ?? "" })
         }
-        style={{...headlineStyle, whiteSpace: "pre-wrap"}}
-      >
-        {block.headline}
-      </div>
+        style={headlineStyle}
+        dangerouslySetInnerHTML={{ __html: (block.headline || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
+      />
 
       {(editing || block.byline) && (
         <div
@@ -136,10 +133,9 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           onBlur={(e) =>
             editing && onChange({ ...block, byline: e.currentTarget.innerText ?? "" })
           }
-          style={{ fontStyle: "italic", fontSize: "0.8em", marginBottom: "1mm", whiteSpace: "pre-wrap" }}
-        >
-          {block.byline}
-        </div>
+          style={{ fontStyle: "italic", fontSize: "0.8em", marginBottom: "1mm" }}
+          dangerouslySetInnerHTML={{ __html: (block.byline || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
+        />
       )}
 
       <div
@@ -336,11 +332,9 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           fontSize: "0.95em",
           lineHeight: 1.4,
           textAlign: "left",
-          whiteSpace: "pre-wrap",
         }}
-      >
-        {block.body}
-      </div>
+        dangerouslySetInnerHTML={{ __html: (block.body || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
+      />
       </div>
 
       {editing && (

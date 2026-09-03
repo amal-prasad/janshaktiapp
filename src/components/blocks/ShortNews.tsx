@@ -50,9 +50,8 @@ function Render({ block, editing, onChange }: BlockRenderProps<ShortNewsBlock>) 
           fontSize: "1.05em",
           padding: "1mm 2mm",
         }}
-      >
-        {block.title}
-      </div>
+        dangerouslySetInnerHTML={{ __html: (block.title || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
+      />
       <div style={{ padding: "1mm 2mm" }}>
         {block.items.map((item, i) => (
           <div
@@ -66,19 +65,17 @@ function Render({ block, editing, onChange }: BlockRenderProps<ShortNewsBlock>) 
               contentEditable={editing}
               suppressContentEditableWarning
               onBlur={handleTitleBlur(i)}
-              style={{ fontWeight: 700, fontSize: "0.92em", whiteSpace: "pre-wrap" }}
-            >
-              {item.title}
-            </div>
+              style={{ fontWeight: 700, fontSize: "0.92em" }}
+              dangerouslySetInnerHTML={{ __html: (item.title || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
+            />
             <div
               contentEditable={editing}
               suppressContentEditableWarning
               onBlur={handleBodyBlur(i)}
               onKeyDown={handleBodyKeyDown(i)}
-              style={{ fontSize: "0.85em", lineHeight: 1.3, whiteSpace: "pre-wrap" }}
-            >
-              {item.body}
-            </div>
+              style={{ fontSize: "0.85em", lineHeight: 1.3 }}
+              dangerouslySetInnerHTML={{ __html: (item.body || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
+            />
           </div>
         ))}
       </div>

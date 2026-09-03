@@ -231,10 +231,9 @@ const Janshakti = ({ fields, color, editing, onChange }: SlotRenderProps) => {
               contentEditable={editing} 
               suppressContentEditableWarning 
               onBlur={(e) => editing && onChange?.({ ...fields, leftBoxText: e.currentTarget.innerText ?? "" })}
-              style={{ whiteSpace: "pre-wrap", backgroundColor: "#b3151b", color: "#fff", fontWeight: "bold", padding: "3px", width: "100%", marginTop: "auto", outline: "none", minHeight: "1.5em" }}
-            >
-              {fields.leftBoxText}
-            </div>
+              style={{ backgroundColor: "#b3151b", color: "#fff", fontWeight: "bold", padding: "3px", width: "100%", marginTop: "auto", outline: "none", minHeight: "1.5em" }}
+              dangerouslySetInnerHTML={{ __html: (fields.leftBoxText || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
+            />
           )}
         </div>
         <div style={{ textAlign: "center", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
@@ -275,10 +274,9 @@ const Janshakti = ({ fields, color, editing, onChange }: SlotRenderProps) => {
               contentEditable={editing} 
               suppressContentEditableWarning 
               onBlur={(e) => editing && onChange?.({ ...fields, rightBoxText: e.currentTarget.innerText ?? "" })}
-              style={{ whiteSpace: "pre-wrap", backgroundColor: "#b3151b", color: "#fff", fontWeight: "bold", padding: "3px", width: "100%", marginTop: "auto", outline: "none", minHeight: "1.5em" }}
-            >
-              {fields.rightBoxText}
-            </div>
+              style={{ backgroundColor: "#b3151b", color: "#fff", fontWeight: "bold", padding: "3px", width: "100%", marginTop: "auto", outline: "none", minHeight: "1.5em" }}
+              dangerouslySetInnerHTML={{ __html: (fields.rightBoxText || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
+            />
           )}
         </div>
       </div>

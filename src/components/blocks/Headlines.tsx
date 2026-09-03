@@ -41,11 +41,9 @@ function Render({ block, editing, onChange }: BlockRenderProps<HeadlinesBlock>) 
           fontWeight: 700,
           fontSize: "1.05em",
           padding: "1mm 2mm",
-          whiteSpace: "pre-wrap",
         }}
-      >
-        {block.title}
-      </div>
+        dangerouslySetInnerHTML={{ __html: (block.title || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
+      />
       <ol style={{ margin: 0, padding: "2mm 5mm", fontSize: "0.9em", lineHeight: 1.4 }}>
         {block.items.map((item, i) => (
           <li
@@ -54,10 +52,8 @@ function Render({ block, editing, onChange }: BlockRenderProps<HeadlinesBlock>) 
             suppressContentEditableWarning
             onBlur={handleBlur(i)}
             onKeyDown={handleKeyDown(i)}
-            style={{ whiteSpace: "pre-wrap" }}
-          >
-            {item}
-          </li>
+            dangerouslySetInnerHTML={{ __html: (item || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
+          />
         ))}
       </ol>
     </div>
