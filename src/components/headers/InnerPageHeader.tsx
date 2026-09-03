@@ -46,11 +46,12 @@ export default function InnerPageHeader({
           </div>
           {headline && (
             <div style={{ 
-              fontSize: "1.8em", 
+              fontSize: "1.9em", 
               fontWeight: 900, 
-              borderBottom: "2px solid #000",
+              fontFamily: '"Arial Black", Impact, sans-serif',
               lineHeight: 1.1,
-              paddingBottom: "1px"
+              paddingBottom: "1px",
+              letterSpacing: "-0.02em"
             }}>
               {headline}
             </div>
