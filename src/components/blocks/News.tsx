@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import type { CSSProperties } from "react";
 import type { NewsBlock } from "@/lib/types";
 import type { BlockDef, BlockRenderProps } from "@/components/blocks/registry";
@@ -14,9 +14,6 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const columnWrapRef = useRef<HTMLDivElement>(null);
   const draggingFocalRef = useRef(false);
-  // Clip figure+body at the last full text line instead of an arbitrary pixel --
-  // a mid-line cut looks broken, a few mm of slack below the last line does not.
-  const [bodyMaxHeightPx, setBodyMaxHeightPx] = useState<number | null>(null);
   const resizeRef = useRef<{ x: number; y: number; widthPct: number; heightMm: number } | null>(
     null
   );
@@ -89,20 +86,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
     window.addEventListener("pointerup", onUp);
   };
 
-  useEffect(() => {
-    const wrap = columnWrapRef.current;
-    const body = bodyRef.current;
-    if (!wrap || !body) return;
-    const recompute = () => {
-      const lineHeightPx = parseFloat(getComputedStyle(body).lineHeight) || 1;
-      const lines = Math.max(1, Math.floor(wrap.clientHeight / lineHeightPx));
-      setBodyMaxHeightPx(lines * lineHeightPx);
-    };
-    recompute();
-    const ro = new ResizeObserver(recompute);
-    ro.observe(wrap);
-    return () => ro.disconnect();
-  }, [block.heightMm, block.columns, image]);
+  // Removed artificial height clamping to minimize gaps
 
   return (
     <div style={{ width: "100%" }}>
@@ -166,7 +150,6 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           flex: "1 1 auto",
           minHeight: 0,
           overflow: "hidden",
-          maxHeight: bodyMaxHeightPx != null ? `${bodyMaxHeightPx}px` : undefined,
         }}
         onClick={(e) => {
           if (editing && e.target === e.currentTarget && bodyRef.current) {
