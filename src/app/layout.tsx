@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_Devanagari, Hind } from "next/font/google";
+import { Noto_Sans_Devanagari } from "next/font/google";
 import "./globals.css";
 
 // One family for the whole product, per requirement. Swap to Noto_Serif_Devanagari
@@ -11,13 +11,6 @@ const noto = Noto_Sans_Devanagari({
   display: "swap",
 });
 
-const hind = Hind({
-  subsets: ["devanagari", "latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-hind",
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   title: "जनशक्ति उजाला — ePaper Designer",
   description: "In-house newspaper layout and PDF export",
@@ -25,7 +18,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="hi" className={`${noto.variable} ${hind.variable}`}>
+    <html lang="hi" className={noto.variable}>
       <head>
         {/*
           An earlier build of this app left a service worker registered on this origin.

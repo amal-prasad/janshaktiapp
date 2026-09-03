@@ -15,14 +15,14 @@ function ResizableImage({
   editing?: boolean;
   onChange?: (w: string, h: string) => void;
 }) {
-  const startResize = (e: React.PointerEvent, type: "e" | "w" | "s" | "n" | "se" | "sw" | "ne" | "nw") => {
+  const startResize = (e: React.PointerEvent, type: "w" | "h" | "both") => {
     if (!editing || !onChange) return;
     e.stopPropagation();
     e.preventDefault();
     const el = (e.currentTarget as HTMLElement).parentElement;
     if (!el) return;
     const zoom = el.offsetWidth ? el.getBoundingClientRect().width / el.offsetWidth : 1;
-    
+
     const initialW = widthMm ? parseFloat(widthMm) : el.getBoundingClientRect().width / (MM_TO_PX * zoom);
     const initialH = heightMm ? parseFloat(heightMm) : el.getBoundingClientRect().height / (MM_TO_PX * zoom);
 
@@ -32,19 +32,15 @@ function ResizableImage({
     const onMove = (ev: PointerEvent) => {
       const dx = ev.clientX - startX;
       const dy = ev.clientY - startY;
-      
-      let newW = initialW;
-      if (type.includes("e")) newW = Math.max(10, initialW + dx / (MM_TO_PX * zoom));
-      else if (type.includes("w")) newW = Math.max(10, initialW - dx / (MM_TO_PX * zoom));
-        
-      let newH = initialH;
-      if (type.includes("s")) newH = Math.max(10, initialH + dy / (MM_TO_PX * zoom));
-      else if (type.includes("n")) newH = Math.max(10, initialH - dy / (MM_TO_PX * zoom));
-        
-      // Ensure it doesn't blow out of reasonable max dimensions for a header (e.g. 200mm)
-      newW = Math.min(newW, 200);
-      newH = Math.min(newH, 150);
-        
+
+      const newW = type === "w" || type === "both"
+        ? Math.max(10, initialW + dx / (MM_TO_PX * zoom))
+        : initialW;
+
+      const newH = type === "h" || type === "both"
+        ? Math.max(10, initialH + dy / (MM_TO_PX * zoom))
+        : initialH;
+
       onChange(newW.toFixed(1), newH.toFixed(1));
     };
 
@@ -57,14 +53,15 @@ function ResizableImage({
   };
 
   return (
-    <div style={{ position: "relative", margin: "0 auto 1mm auto", display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "100%" }}>
+    <div style={{ position: "relative", margin: "0 auto 1mm auto", display: "flex", flexDirection: "column", alignItems: "center" }}>
       <img
         src={src}
         style={{
           width: widthMm ? `${widthMm}mm` : "100%",
           height: heightMm ? `${heightMm}mm` : "auto",
           maxWidth: "100%",
-          objectFit: "contain",
+          maxHeight: heightMm ? "none" : "25mm",
+          objectFit: heightMm ? "cover" : "contain",
           display: "block",
         }}
         alt=""
@@ -72,17 +69,18 @@ function ResizableImage({
       />
       {editing && (
         <>
-          {/* Edges */}
-          <div onPointerDown={(e) => startResize(e, "e")} style={{ position: "absolute", right: -5, top: 0, bottom: 0, width: "10px", cursor: "ew-resize", zIndex: 10, touchAction: "none" }} />
-          <div onPointerDown={(e) => startResize(e, "w")} style={{ position: "absolute", left: -5, top: 0, bottom: 0, width: "10px", cursor: "ew-resize", zIndex: 10, touchAction: "none" }} />
-          <div onPointerDown={(e) => startResize(e, "s")} style={{ position: "absolute", bottom: -5, left: 0, right: 0, height: "10px", cursor: "ns-resize", zIndex: 10, touchAction: "none" }} />
-          <div onPointerDown={(e) => startResize(e, "n")} style={{ position: "absolute", top: -5, left: 0, right: 0, height: "10px", cursor: "ns-resize", zIndex: 10, touchAction: "none" }} />
-          
-          {/* Corners */}
-          <div onPointerDown={(e) => startResize(e, "se")} style={{ position: "absolute", right: -4, bottom: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nwse-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }} />
-          <div onPointerDown={(e) => startResize(e, "sw")} style={{ position: "absolute", left: -4, bottom: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nesw-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }} />
-          <div onPointerDown={(e) => startResize(e, "ne")} style={{ position: "absolute", right: -4, top: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nesw-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }} />
-          <div onPointerDown={(e) => startResize(e, "nw")} style={{ position: "absolute", left: -4, top: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nwse-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }} />
+          <div
+            onPointerDown={(e) => startResize(e, "w")}
+            style={{ position: "absolute", right: -5, top: 0, bottom: 0, width: "10px", cursor: "ew-resize", zIndex: 10, touchAction: "none" }}
+          />
+          <div
+            onPointerDown={(e) => startResize(e, "h")}
+            style={{ position: "absolute", bottom: -5, left: 0, right: 0, height: "10px", cursor: "ns-resize", zIndex: 10, touchAction: "none" }}
+          />
+          <div
+            onPointerDown={(e) => startResize(e, "both")}
+            style={{ position: "absolute", right: -4, bottom: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nwse-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }}
+          />
         </>
       )}
     </div>
@@ -189,12 +187,9 @@ const janshaktiFields = [
   { key: "weeklyLabel", label: "ऊपर लेबल", default: "साप्ताहिक" },
   { key: "tagline", label: "टैगलाइन", default: "जनता की आवाज, सत्य का उजाला..." },
   { key: "leftBoxImage", label: "बायाँ बॉक्स - चित्र", default: "" },
-  { key: "leftBoxImageWidth", label: "बायाँ चित्र चौड़ाई (mm)", default: "45" },
-  { key: "leftBoxImageHeight", label: "बायाँ चित्र ऊंचाई (mm)", default: "" },
   { key: "leftBoxText", label: "बायाँ बॉक्स - टेक्स्ट", default: "" },
   { key: "rightBoxImage", label: "दायाँ बॉक्स - चित्र", default: "" },
-  { key: "rightBoxImageWidth", label: "दायाँ चित्र चौड़ाई (mm)", default: "45" },
-  { key: "rightBoxImageHeight", label: "दायाँ चित्र ऊंचाई (mm)", default: "" },
+  { key: "rightBoxText", label: "दायाँ बॉक्स - टेक्स्ट", default: "" },
   { key: "year", label: "वर्ष", default: "1" },
   { key: "issue", label: "अंक", default: "1" },
   { key: "frequency", label: "आवृत्ति", default: "(प्रति सोमवार)" },
@@ -216,42 +211,43 @@ const Janshakti = ({ fields, color, editing, onChange }: SlotRenderProps) => {
       <div style={{ display: "flex", alignItems: "stretch", justifyContent: "space-between", gap: "3mm", padding: "1mm 2mm" }}>
         <div onClick={onBoxClick} style={{ flex: `0 0 ${fields.leftBoxImageWidth ?? "45"}mm`, border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column", overflow: "hidden" }}>
           {fields.leftBoxImage ? (
-            <ResizableImage 
-              src={fields.leftBoxImage} 
-              widthMm={fields.leftBoxImageWidth} 
-              heightMm={fields.leftBoxImageHeight} 
-              editing={editing} 
-              onChange={(w, h) => onChange?.({ ...fields, leftBoxImageWidth: w, leftBoxImageHeight: h })} 
+            <ResizableImage
+              src={fields.leftBoxImage}
+              widthMm={fields.leftBoxImageWidth}
+              heightMm={fields.leftBoxImageHeight}
+              editing={editing}
+              onChange={(w, h) => onChange?.({ ...fields, leftBoxImageWidth: w, leftBoxImageHeight: h })}
             />
           ) : !fields.leftBoxText ? (
             <div style={{ margin: "auto", color: "#aaa", cursor: "pointer" }}>चित्र या टेक्स्ट जोड़ें</div>
           ) : null}
           {(fields.leftBoxText || editing) && (
-            <div 
-              contentEditable={editing} 
-              suppressContentEditableWarning 
-              onBlur={(e) => editing && onChange?.({ ...fields, leftBoxText: e.currentTarget.innerText ?? "" })}
-              style={{ backgroundColor: "#b3151b", color: "#fff", fontWeight: "bold", padding: "3px", width: "100%", marginTop: "auto", outline: "none", minHeight: "1.5em" }}
-              dangerouslySetInnerHTML={{ __html: (fields.leftBoxText || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
-            />
+            <div
+              contentEditable={editing}
+              suppressContentEditableWarning
+              onBlur={(e) => editing && onChange?.({ ...fields, leftBoxText: e.currentTarget.textContent ?? "" })}
+              style={{ whiteSpace: "pre-wrap", backgroundColor: "#b3151b", color: "#fff", fontWeight: "bold", padding: "3px", width: "100%", marginTop: "auto", outline: "none", minHeight: "1.5em" }}
+            >
+              {fields.leftBoxText}
+            </div>
           )}
         </div>
         <div style={{ textAlign: "center", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
           {(fields.weeklyLabel || editing) && (
-            <div 
-              contentEditable={editing} 
-              suppressContentEditableWarning 
-              onBlur={(e) => editing && onChange?.({ ...fields, weeklyLabel: e.currentTarget.innerText ?? "" })}
+            <div
+              contentEditable={editing}
+              suppressContentEditableWarning
+              onBlur={(e) => editing && onChange?.({ ...fields, weeklyLabel: e.currentTarget.textContent ?? "" })}
               style={{ alignSelf: "flex-start", marginLeft: "10%", fontSize: "1.1em", fontWeight: 700, outline: "none", minWidth: "50px", minHeight: "1.2em" }}
             >
               {fields.weeklyLabel}
             </div>
           )}
           <img src="/logo.png?v=3" alt={fields.newspaperName} style={{ width: "100%", height: "auto", maxHeight: "45mm", objectFit: "contain" }} />
-          <div 
-            contentEditable={editing} 
-            suppressContentEditableWarning 
-            onBlur={(e) => editing && onChange?.({ ...fields, tagline: e.currentTarget.innerText ?? "" })}
+          <div
+            contentEditable={editing}
+            suppressContentEditableWarning
+            onBlur={(e) => editing && onChange?.({ ...fields, tagline: e.currentTarget.textContent ?? "" })}
             style={{ fontSize: "1.05em", fontWeight: 700, margin: "1mm 0 0", outline: "none", minWidth: "100px" }}
           >
             {fields.tagline}
@@ -259,39 +255,40 @@ const Janshakti = ({ fields, color, editing, onChange }: SlotRenderProps) => {
         </div>
         <div onClick={onBoxClick} style={{ flex: `0 0 ${fields.rightBoxImageWidth ?? "45"}mm`, border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column", overflow: "hidden" }}>
           {fields.rightBoxImage ? (
-            <ResizableImage 
-              src={fields.rightBoxImage} 
-              widthMm={fields.rightBoxImageWidth} 
-              heightMm={fields.rightBoxImageHeight} 
-              editing={editing} 
-              onChange={(w, h) => onChange?.({ ...fields, rightBoxImageWidth: w, rightBoxImageHeight: h })} 
+            <ResizableImage
+              src={fields.rightBoxImage}
+              widthMm={fields.rightBoxImageWidth}
+              heightMm={fields.rightBoxImageHeight}
+              editing={editing}
+              onChange={(w, h) => onChange?.({ ...fields, rightBoxImageWidth: w, rightBoxImageHeight: h })}
             />
           ) : !fields.rightBoxText ? (
             <div style={{ margin: "auto", color: "#aaa", cursor: "pointer" }}>चित्र या टेक्स्ट जोड़ें</div>
           ) : null}
           {(fields.rightBoxText || editing) && (
-            <div 
-              contentEditable={editing} 
-              suppressContentEditableWarning 
-              onBlur={(e) => editing && onChange?.({ ...fields, rightBoxText: e.currentTarget.innerText ?? "" })}
-              style={{ backgroundColor: "#b3151b", color: "#fff", fontWeight: "bold", padding: "3px", width: "100%", marginTop: "auto", outline: "none", minHeight: "1.5em" }}
-              dangerouslySetInnerHTML={{ __html: (fields.rightBoxText || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>") }}
-            />
+            <div
+              contentEditable={editing}
+              suppressContentEditableWarning
+              onBlur={(e) => editing && onChange?.({ ...fields, rightBoxText: e.currentTarget.textContent ?? "" })}
+              style={{ whiteSpace: "pre-wrap", backgroundColor: "#b3151b", color: "#fff", fontWeight: "bold", padding: "3px", width: "100%", marginTop: "auto", outline: "none", minHeight: "1.5em" }}
+            >
+              {fields.rightBoxText}
+            </div>
           )}
         </div>
       </div>
       <div style={{ background: "#0b4a8f", color: "#fff", padding: "1.2mm 3mm", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.78em", fontWeight: 700 }}>
         <div style={{ display: "flex", gap: "8mm" }}>
-          <span>वर्ष : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, year: e.currentTarget.innerText ?? "" })} style={{outline: "none"}}>{fields.year}</span></span>
-          <span>अंक : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, issue: e.currentTarget.innerText ?? "" })} style={{outline: "none"}}>{fields.issue}</span></span>
-          <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, frequency: e.currentTarget.innerText ?? "" })} style={{outline: "none"}}>{fields.frequency}</span>
+          <span>वर्ष : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, year: e.currentTarget.textContent ?? "" })} style={{ outline: "none" }}>{fields.year}</span></span>
+          <span>अंक : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, issue: e.currentTarget.textContent ?? "" })} style={{ outline: "none" }}>{fields.issue}</span></span>
+          <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, frequency: e.currentTarget.textContent ?? "" })} style={{ outline: "none" }}>{fields.frequency}</span>
         </div>
-        <div contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, datePlace: e.currentTarget.innerText ?? "" })} style={{ letterSpacing: "0.02em", outline: "none" }}>
+        <div contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, datePlace: e.currentTarget.textContent ?? "" })} style={{ letterSpacing: "0.02em", outline: "none" }}>
           {fields.datePlace}
         </div>
         <div style={{ display: "flex", gap: "8mm" }}>
-          <span>पेज : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, pages: e.currentTarget.innerText ?? "" })} style={{outline: "none"}}>{fields.pages}</span></span>
-          <span>मूल्य : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, price: e.currentTarget.innerText ?? "" })} style={{outline: "none"}}>{fields.price}</span></span>
+          <span>पेज : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, pages: e.currentTarget.textContent ?? "" })} style={{ outline: "none" }}>{fields.pages}</span></span>
+          <span>मूल्य : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, price: e.currentTarget.textContent ?? "" })} style={{ outline: "none" }}>{fields.price}</span></span>
         </div>
       </div>
     </div>
