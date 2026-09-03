@@ -26,12 +26,12 @@ function Render({ block, editing, onChange }: BlockRenderProps<ShortNewsBlock>) 
   };
 
   const handleTitleBlur = (i: number) => (e: FocusEvent<HTMLDivElement>) => {
-    const text = e.currentTarget.textContent ?? "";
+    const text = e.currentTarget.innerText ?? "";
     if (!removeIfEmpty(i)) setItem(i, { title: text });
   };
 
   const handleBodyBlur = (i: number) => (e: FocusEvent<HTMLDivElement>) => {
-    const text = e.currentTarget.textContent ?? "";
+    const text = e.currentTarget.innerText ?? "";
     if (!removeIfEmpty(i)) setItem(i, { body: text });
   };
 
@@ -41,7 +41,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<ShortNewsBlock>) 
         contentEditable={editing}
         suppressContentEditableWarning
         onBlur={(e) =>
-          editing && onChange({ ...block, title: e.currentTarget.textContent ?? "" })
+          editing && onChange({ ...block, title: e.currentTarget.innerText ?? "" })
         }
         style={{
           background: "#c0392b",
@@ -66,7 +66,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<ShortNewsBlock>) 
               contentEditable={editing}
               suppressContentEditableWarning
               onBlur={handleTitleBlur(i)}
-              style={{ fontWeight: 700, fontSize: "0.92em" }}
+              style={{ fontWeight: 700, fontSize: "0.92em", whiteSpace: "pre-wrap" }}
             >
               {item.title}
             </div>
@@ -75,7 +75,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<ShortNewsBlock>) 
               suppressContentEditableWarning
               onBlur={handleBodyBlur(i)}
               onKeyDown={handleBodyKeyDown(i)}
-              style={{ fontSize: "0.85em", lineHeight: 1.3 }}
+              style={{ fontSize: "0.85em", lineHeight: 1.3, whiteSpace: "pre-wrap" }}
             >
               {item.body}
             </div>

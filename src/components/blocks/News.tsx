@@ -103,7 +103,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           contentEditable={editing}
           suppressContentEditableWarning
           onBlur={(e) =>
-            editing && onChange({ ...block, subhead: e.currentTarget.textContent ?? "" })
+            editing && onChange({ ...block, subhead: e.currentTarget.innerText ?? "" })
           }
           className="empty:before:content-['सबहेडर'] empty:before:text-gray-400 focus:outline-none"
           style={{
@@ -111,6 +111,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
             fontWeight: 700,
             fontSize: `${1.1 * (block.headlineScale ?? 1)}em`,
             marginBottom: "0.5mm",
+            whiteSpace: "pre-wrap",
           }}
         >
           {block.subhead}
@@ -121,9 +122,9 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
         contentEditable={editing}
         suppressContentEditableWarning
         onBlur={(e) =>
-          editing && onChange({ ...block, headline: e.currentTarget.textContent ?? "" })
+          editing && onChange({ ...block, headline: e.currentTarget.innerText ?? "" })
         }
-        style={headlineStyle}
+        style={{...headlineStyle, whiteSpace: "pre-wrap"}}
       >
         {block.headline}
       </div>
@@ -133,9 +134,9 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           contentEditable={editing}
           suppressContentEditableWarning
           onBlur={(e) =>
-            editing && onChange({ ...block, byline: e.currentTarget.textContent ?? "" })
+            editing && onChange({ ...block, byline: e.currentTarget.innerText ?? "" })
           }
-          style={{ fontStyle: "italic", fontSize: "0.8em", marginBottom: "1mm" }}
+          style={{ fontStyle: "italic", fontSize: "0.8em", marginBottom: "1mm", whiteSpace: "pre-wrap" }}
         >
           {block.byline}
         </div>
@@ -326,7 +327,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
         contentEditable={editing}
         suppressContentEditableWarning
         onBlur={(e) =>
-          editing && onChange({ ...block, body: e.currentTarget.textContent ?? "" })
+          editing && onChange({ ...block, body: e.currentTarget.innerText ?? "" })
         }
         className="empty:before:content-['यहाँ_टेक्स्ट_लिखें...'] empty:before:text-gray-400 focus:outline-none"
         style={{
@@ -335,6 +336,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           fontSize: "0.95em",
           lineHeight: 1.4,
           textAlign: "left",
+          whiteSpace: "pre-wrap",
         }}
       >
         {block.body}

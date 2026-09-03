@@ -15,7 +15,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<RashifalBlock>) {
         contentEditable={editing}
         suppressContentEditableWarning
         onBlur={(e) =>
-          editing && onChange({ ...block, title: e.currentTarget.textContent ?? "" })
+          editing && onChange({ ...block, title: e.currentTarget.innerText ?? "" })
         }
         style={{
           background: "#c0392b",
@@ -23,6 +23,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<RashifalBlock>) {
           fontWeight: 700,
           fontSize: "1.05em",
           padding: "1mm 2mm",
+          whiteSpace: "pre-wrap",
         }}
       >
         {block.title}
@@ -41,8 +42,8 @@ function Render({ block, editing, onChange }: BlockRenderProps<RashifalBlock>) {
             <div
               contentEditable={editing}
               suppressContentEditableWarning
-              onBlur={(e) => editing && setText(i, e.currentTarget.textContent ?? "")}
-              style={{ fontSize: "0.78em", lineHeight: 1.3 }}
+              onBlur={(e) => editing && setText(i, e.currentTarget.innerText ?? "")}
+              style={{ fontSize: "0.78em", lineHeight: 1.3, whiteSpace: "pre-wrap" }}
             >
               {sign.text}
             </div>

@@ -92,8 +92,9 @@ export default function SlotPicker({ editionId, edition }: { editionId: string; 
       {template && (
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           {template.fields.map((f) => {
-            const isImage = f.key.toLowerCase().includes("image");
-            const isTextarea = f.key.toLowerCase().includes("text");
+            const lowerKey = f.key.toLowerCase();
+            const isImage = lowerKey.includes("image") && !lowerKey.includes("width") && !lowerKey.includes("height");
+            const isTextarea = lowerKey.includes("text");
             return (
               <label key={f.key} style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
                 <span style={{ fontSize: "11px", color: "#555" }}>{f.label}</span>

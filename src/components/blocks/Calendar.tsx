@@ -42,7 +42,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<CalendarBlock>) {
           contentEditable={editing}
           suppressContentEditableWarning
           onBlur={(e) =>
-            editing && onChange({ ...block, title: e.currentTarget.textContent ?? "" })
+            editing && onChange({ ...block, title: e.currentTarget.innerText ?? "" })
           }
         >
           {block.title ?? "पंचांग"}

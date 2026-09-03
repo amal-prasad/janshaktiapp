@@ -11,7 +11,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<HeadlinesBlock>) 
   };
 
   const handleBlur = (i: number) => (e: FocusEvent<HTMLLIElement>) => {
-    const text = e.currentTarget.textContent ?? "";
+    const text = e.currentTarget.innerText ?? "";
     if (text.trim() === "" && block.items.length > 1) {
       const items = block.items.filter((_, idx) => idx !== i);
       onChange({ ...block, items });
@@ -33,7 +33,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<HeadlinesBlock>) 
         contentEditable={editing}
         suppressContentEditableWarning
         onBlur={(e) =>
-          editing && onChange({ ...block, title: e.currentTarget.textContent ?? "" })
+          editing && onChange({ ...block, title: e.currentTarget.innerText ?? "" })
         }
         style={{
           background: "#c0392b",
@@ -41,6 +41,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<HeadlinesBlock>) 
           fontWeight: 700,
           fontSize: "1.05em",
           padding: "1mm 2mm",
+          whiteSpace: "pre-wrap",
         }}
       >
         {block.title}
@@ -53,6 +54,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<HeadlinesBlock>) 
             suppressContentEditableWarning
             onBlur={handleBlur(i)}
             onKeyDown={handleKeyDown(i)}
+            style={{ whiteSpace: "pre-wrap" }}
           >
             {item}
           </li>

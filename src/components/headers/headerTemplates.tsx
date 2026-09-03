@@ -57,15 +57,14 @@ function ResizableImage({
   };
 
   return (
-    <div style={{ position: "relative", margin: "0 auto 1mm auto", display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "100%", maxHeight: "100%" }}>
+    <div style={{ position: "relative", margin: "0 auto 1mm auto", display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "100%" }}>
       <img
         src={src}
         style={{
           width: widthMm ? `${widthMm}mm` : "100%",
           height: heightMm ? `${heightMm}mm` : "auto",
           maxWidth: "100%",
-          maxHeight: heightMm ? "none" : "25mm",
-          objectFit: heightMm ? "cover" : "contain",
+          objectFit: "contain",
           display: "block",
         }}
         alt=""
@@ -190,9 +189,12 @@ const janshaktiFields = [
   { key: "weeklyLabel", label: "ऊपर लेबल", default: "साप्ताहिक" },
   { key: "tagline", label: "टैगलाइन", default: "जनता की आवाज, सत्य का उजाला..." },
   { key: "leftBoxImage", label: "बायाँ बॉक्स - चित्र", default: "" },
+  { key: "leftBoxImageWidth", label: "बायाँ चित्र चौड़ाई (mm)", default: "45" },
+  { key: "leftBoxImageHeight", label: "बायाँ चित्र ऊंचाई (mm)", default: "" },
   { key: "leftBoxText", label: "बायाँ बॉक्स - टेक्स्ट", default: "" },
   { key: "rightBoxImage", label: "दायाँ बॉक्स - चित्र", default: "" },
-  { key: "rightBoxText", label: "दायाँ बॉक्स - टेक्स्ट", default: "" },
+  { key: "rightBoxImageWidth", label: "दायाँ चित्र चौड़ाई (mm)", default: "45" },
+  { key: "rightBoxImageHeight", label: "दायाँ चित्र ऊंचाई (mm)", default: "" },
   { key: "year", label: "वर्ष", default: "1" },
   { key: "issue", label: "अंक", default: "1" },
   { key: "frequency", label: "आवृत्ति", default: "(प्रति सोमवार)" },
@@ -228,7 +230,7 @@ const Janshakti = ({ fields, color, editing, onChange }: SlotRenderProps) => {
             <div 
               contentEditable={editing} 
               suppressContentEditableWarning 
-              onBlur={(e) => editing && onChange?.({ ...fields, leftBoxText: e.currentTarget.textContent ?? "" })}
+              onBlur={(e) => editing && onChange?.({ ...fields, leftBoxText: e.currentTarget.innerText ?? "" })}
               style={{ whiteSpace: "pre-wrap", backgroundColor: "#b3151b", color: "#fff", fontWeight: "bold", padding: "3px", width: "100%", marginTop: "auto", outline: "none", minHeight: "1.5em" }}
             >
               {fields.leftBoxText}
@@ -240,7 +242,7 @@ const Janshakti = ({ fields, color, editing, onChange }: SlotRenderProps) => {
             <div 
               contentEditable={editing} 
               suppressContentEditableWarning 
-              onBlur={(e) => editing && onChange?.({ ...fields, weeklyLabel: e.currentTarget.textContent ?? "" })}
+              onBlur={(e) => editing && onChange?.({ ...fields, weeklyLabel: e.currentTarget.innerText ?? "" })}
               style={{ alignSelf: "flex-start", marginLeft: "10%", fontSize: "1.1em", fontWeight: 700, outline: "none", minWidth: "50px", minHeight: "1.2em" }}
             >
               {fields.weeklyLabel}
@@ -250,7 +252,7 @@ const Janshakti = ({ fields, color, editing, onChange }: SlotRenderProps) => {
           <div 
             contentEditable={editing} 
             suppressContentEditableWarning 
-            onBlur={(e) => editing && onChange?.({ ...fields, tagline: e.currentTarget.textContent ?? "" })}
+            onBlur={(e) => editing && onChange?.({ ...fields, tagline: e.currentTarget.innerText ?? "" })}
             style={{ fontSize: "1.05em", fontWeight: 700, margin: "1mm 0 0", outline: "none", minWidth: "100px" }}
           >
             {fields.tagline}
@@ -272,7 +274,7 @@ const Janshakti = ({ fields, color, editing, onChange }: SlotRenderProps) => {
             <div 
               contentEditable={editing} 
               suppressContentEditableWarning 
-              onBlur={(e) => editing && onChange?.({ ...fields, rightBoxText: e.currentTarget.textContent ?? "" })}
+              onBlur={(e) => editing && onChange?.({ ...fields, rightBoxText: e.currentTarget.innerText ?? "" })}
               style={{ whiteSpace: "pre-wrap", backgroundColor: "#b3151b", color: "#fff", fontWeight: "bold", padding: "3px", width: "100%", marginTop: "auto", outline: "none", minHeight: "1.5em" }}
             >
               {fields.rightBoxText}
@@ -282,16 +284,16 @@ const Janshakti = ({ fields, color, editing, onChange }: SlotRenderProps) => {
       </div>
       <div style={{ background: "#0b4a8f", color: "#fff", padding: "1.2mm 3mm", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.78em", fontWeight: 700 }}>
         <div style={{ display: "flex", gap: "8mm" }}>
-          <span>वर्ष : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, year: e.currentTarget.textContent ?? "" })} style={{outline: "none"}}>{fields.year}</span></span>
-          <span>अंक : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, issue: e.currentTarget.textContent ?? "" })} style={{outline: "none"}}>{fields.issue}</span></span>
-          <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, frequency: e.currentTarget.textContent ?? "" })} style={{outline: "none"}}>{fields.frequency}</span>
+          <span>वर्ष : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, year: e.currentTarget.innerText ?? "" })} style={{outline: "none"}}>{fields.year}</span></span>
+          <span>अंक : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, issue: e.currentTarget.innerText ?? "" })} style={{outline: "none"}}>{fields.issue}</span></span>
+          <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, frequency: e.currentTarget.innerText ?? "" })} style={{outline: "none"}}>{fields.frequency}</span>
         </div>
-        <div contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, datePlace: e.currentTarget.textContent ?? "" })} style={{ letterSpacing: "0.02em", outline: "none" }}>
+        <div contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, datePlace: e.currentTarget.innerText ?? "" })} style={{ letterSpacing: "0.02em", outline: "none" }}>
           {fields.datePlace}
         </div>
         <div style={{ display: "flex", gap: "8mm" }}>
-          <span>पेज : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, pages: e.currentTarget.textContent ?? "" })} style={{outline: "none"}}>{fields.pages}</span></span>
-          <span>मूल्य : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, price: e.currentTarget.textContent ?? "" })} style={{outline: "none"}}>{fields.price}</span></span>
+          <span>पेज : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, pages: e.currentTarget.innerText ?? "" })} style={{outline: "none"}}>{fields.pages}</span></span>
+          <span>मूल्य : <span contentEditable={editing} suppressContentEditableWarning onBlur={(e) => editing && onChange?.({ ...fields, price: e.currentTarget.innerText ?? "" })} style={{outline: "none"}}>{fields.price}</span></span>
         </div>
       </div>
     </div>
