@@ -15,7 +15,7 @@ function ResizableImage({
   editing?: boolean;
   onChange?: (w: string, h: string) => void;
 }) {
-  const startResize = (e: React.PointerEvent, type: "w" | "h" | "both") => {
+  const startResize = (e: React.PointerEvent, type: "e" | "w" | "s" | "n" | "se" | "sw" | "ne" | "nw") => {
     if (!editing || !onChange) return;
     e.stopPropagation();
     e.preventDefault();
@@ -33,13 +33,17 @@ function ResizableImage({
       const dx = ev.clientX - startX;
       const dy = ev.clientY - startY;
       
-      const newW = type === "w" || type === "both"
-        ? Math.max(10, initialW + dx / (MM_TO_PX * zoom))
-        : initialW;
+      let newW = initialW;
+      if (type.includes("e")) newW = Math.max(10, initialW + dx / (MM_TO_PX * zoom));
+      else if (type.includes("w")) newW = Math.max(10, initialW - dx / (MM_TO_PX * zoom));
         
-      const newH = type === "h" || type === "both"
-        ? Math.max(10, initialH + dy / (MM_TO_PX * zoom))
-        : initialH;
+      let newH = initialH;
+      if (type.includes("s")) newH = Math.max(10, initialH + dy / (MM_TO_PX * zoom));
+      else if (type.includes("n")) newH = Math.max(10, initialH - dy / (MM_TO_PX * zoom));
+        
+      // Ensure it doesn't blow out of reasonable max dimensions for a header (e.g. 200mm)
+      newW = Math.min(newW, 200);
+      newH = Math.min(newH, 150);
         
       onChange(newW.toFixed(1), newH.toFixed(1));
     };
@@ -53,7 +57,7 @@ function ResizableImage({
   };
 
   return (
-    <div style={{ position: "relative", margin: "0 auto 1mm auto", display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div style={{ position: "relative", margin: "0 auto 1mm auto", display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "100%", maxHeight: "100%" }}>
       <img
         src={src}
         style={{
@@ -69,18 +73,17 @@ function ResizableImage({
       />
       {editing && (
         <>
-          <div
-            onPointerDown={(e) => startResize(e, "w")}
-            style={{ position: "absolute", right: -5, top: 0, bottom: 0, width: "10px", cursor: "ew-resize", zIndex: 10, touchAction: "none" }}
-          />
-          <div
-            onPointerDown={(e) => startResize(e, "h")}
-            style={{ position: "absolute", bottom: -5, left: 0, right: 0, height: "10px", cursor: "ns-resize", zIndex: 10, touchAction: "none" }}
-          />
-          <div
-            onPointerDown={(e) => startResize(e, "both")}
-            style={{ position: "absolute", right: -4, bottom: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nwse-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }}
-          />
+          {/* Edges */}
+          <div onPointerDown={(e) => startResize(e, "e")} style={{ position: "absolute", right: -5, top: 0, bottom: 0, width: "10px", cursor: "ew-resize", zIndex: 10, touchAction: "none" }} />
+          <div onPointerDown={(e) => startResize(e, "w")} style={{ position: "absolute", left: -5, top: 0, bottom: 0, width: "10px", cursor: "ew-resize", zIndex: 10, touchAction: "none" }} />
+          <div onPointerDown={(e) => startResize(e, "s")} style={{ position: "absolute", bottom: -5, left: 0, right: 0, height: "10px", cursor: "ns-resize", zIndex: 10, touchAction: "none" }} />
+          <div onPointerDown={(e) => startResize(e, "n")} style={{ position: "absolute", top: -5, left: 0, right: 0, height: "10px", cursor: "ns-resize", zIndex: 10, touchAction: "none" }} />
+          
+          {/* Corners */}
+          <div onPointerDown={(e) => startResize(e, "se")} style={{ position: "absolute", right: -4, bottom: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nwse-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }} />
+          <div onPointerDown={(e) => startResize(e, "sw")} style={{ position: "absolute", left: -4, bottom: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nesw-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }} />
+          <div onPointerDown={(e) => startResize(e, "ne")} style={{ position: "absolute", right: -4, top: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nesw-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }} />
+          <div onPointerDown={(e) => startResize(e, "nw")} style={{ position: "absolute", left: -4, top: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nwse-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }} />
         </>
       )}
     </div>
