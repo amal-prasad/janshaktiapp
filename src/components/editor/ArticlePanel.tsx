@@ -1,6 +1,7 @@
 "use client";
 import { findBlockLocation, updateBlock } from "@/components/editor/rowOps";
 import ImagePicker from "@/components/editor/ImagePicker";
+import TextPanel from "@/components/editor/TextPanel";
 import { columnWidthMm } from "@/lib/dpi";
 import type { AdBlock, Block, NewsBlock, Row } from "@/lib/types";
 
@@ -56,13 +57,17 @@ function NewsControls({
   editionId: string;
   placedMm: number;
 }) {
-  const wrapping = block.image?.float === "left" || block.image?.float === "right";
+  const imgFloat = block.image?.float ?? "left";
+  const wrapping = imgFloat === "left" || imgFloat === "right";
+  const imgAlign = block.image?.align ?? (imgFloat === "center" ? "center" : "left");
   const columns = block.columns ?? (wrapping ? 1 : 2);
   const scale = block.headlineScale ?? 1;
 
   return (
     <div className="space-y-3 p-3">
-      <div className="space-y-1">
+      <TextPanel />
+
+      <div className="space-y-1 border-t border-gray-200 pt-2">
         <label className="text-sm font-semibold">कॉलम</label>
         <select
           className="w-full rounded border border-gray-300 p-1 text-sm"
@@ -109,40 +114,59 @@ function NewsControls({
       {block.image && (
         <div className="space-y-3 border-t border-gray-200 pt-2">
           <div className="space-y-1">
-            <label className="text-sm font-semibold">फ़ोटो स्थान</label>
+            <label className="text-sm font-semibold">टेक्स्ट लपेट</label>
             <div className="flex flex-wrap gap-1">
-              <button
-                type="button"
-                className="rounded bg-gray-100 px-2 py-1 text-xs hover:bg-gray-200"
-                onClick={() => set({ ...block, image: { ...block.image!, float: "left" } })}
-              >
-                बाएँ
-              </button>
-              {columns === 3 && (
+              {([
+                { v: "left", label: "बाएँ लपेटें" },
+                { v: "right", label: "दाएँ लपेटें" },
+                { v: "full", label: "बिना लपेटे" },
+              ] as const).map((o) => (
                 <button
+                  key={o.v}
                   type="button"
-                  className="rounded bg-gray-100 px-2 py-1 text-xs hover:bg-gray-200"
-                  onClick={() => set({ ...block, image: { ...block.image!, float: "center" } })}
+                  className={`rounded px-2 py-1 text-xs ${
+                    (o.v === "full" ? !wrapping : imgFloat === o.v)
+                      ? "bg-blue-200"
+                      : "bg-gray-100 hover:bg-gray-200"
+                  }`}
+                  onClick={() => set({ ...block, image: { ...block.image!, float: o.v } })}
                 >
-                  बीच
+                  {o.label}
                 </button>
-              )}
-              <button
-                type="button"
-                className="rounded bg-gray-100 px-2 py-1 text-xs hover:bg-gray-200"
-                onClick={() => set({ ...block, image: { ...block.image!, float: "right" } })}
-              >
-                दाएँ
-              </button>
-              <button
-                type="button"
-                className="rounded bg-gray-100 px-2 py-1 text-xs hover:bg-gray-200"
-                onClick={() => set({ ...block, image: { ...block.image!, float: "full" } })}
-              >
-                पूरा
-              </button>
+              ))}
             </div>
           </div>
+
+          {/* Alignment only means anything once the photo spans the columns --
+              a floated photo is already pinned to the edge it wraps against. */}
+          {!wrapping && (
+            <div className="space-y-1">
+              <label className="text-sm font-semibold">आर्टिकल बॉक्स में स्थान</label>
+              <div className="flex flex-wrap gap-1">
+                {([
+                  { v: "left", label: "◧ बाएँ किनारे" },
+                  { v: "center", label: "▣ बीच में" },
+                  { v: "right", label: "◨ दाएँ किनारे" },
+                ] as const).map((o) => (
+                  <button
+                    key={o.v}
+                    type="button"
+                    className={`rounded px-2 py-1 text-xs ${
+                      imgAlign === o.v ? "bg-blue-200" : "bg-gray-100 hover:bg-gray-200"
+                    }`}
+                    onClick={() =>
+                      set({ ...block, image: { ...block.image!, float: "full", align: o.v } })
+                    }
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] text-gray-500">
+                चौड़ाई 100% से कम करने पर स्थान दिखाई देगा
+              </p>
+            </div>
+          )}
 
           <div className="space-y-1">
             <label className="text-xs font-semibold">

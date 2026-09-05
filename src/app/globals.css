@@ -2,11 +2,60 @@
 
 :root {
   --font-hi: var(--font-noto-dev), system-ui, sans-serif;
+  --font-halant-hi: var(--font-halant), Georgia, serif;
 }
 
 html,
 body {
   font-family: var(--font-hi);
+}
+
+/* Rich-text article body. Tailwind's preflight flattens lists and headings, so
+   the WYSIWYG body has to restore print-sane defaults -- these apply in the
+   editor and in the print route alike, which is what keeps the two identical. */
+.news-body ul,
+.news-body ol {
+  padding-left: 1.4em;
+  margin: 0.3em 0;
+}
+.news-body ul {
+  list-style: disc outside;
+}
+.news-body ol {
+  list-style: decimal outside;
+}
+.news-body li {
+  margin-bottom: 0.15em;
+}
+.news-body p {
+  margin: 0 0 0.4em;
+}
+.news-body h3,
+.news-body h4 {
+  font-weight: 700;
+  margin: 0.3em 0 0.2em;
+}
+.news-body h3 {
+  font-size: 1.15em;
+}
+.news-body h4 {
+  font-size: 1.05em;
+}
+.news-body blockquote {
+  margin: 0.3em 0;
+  padding-left: 0.8em;
+  border-left: 2px solid #d4d4d4;
+}
+.news-body b,
+.news-body strong {
+  font-weight: 700;
+}
+.news-body i,
+.news-body em {
+  font-style: italic;
+}
+.news-body u {
+  text-decoration: underline;
 }
 
 /* Editor canvas scales a true-size page down. Padding/box-sizing mirror the

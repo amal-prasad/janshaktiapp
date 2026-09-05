@@ -35,6 +35,9 @@ export type ImageRef = {
   heightMm?: number;
   /** how body text sits against the photo. undefined = "full" (photo above, no wrap) */
   float?: "left" | "right" | "full" | "center";
+  /** horizontal placement inside the article box when the photo does not wrap
+   *  (float "full"). undefined = "center" */
+  align?: "left" | "center" | "right";
 };
 
 type Base = { id: string };
@@ -44,8 +47,13 @@ export type NewsBlock = Base & {
   subhead?: string;
   headline: string;
   byline?: string;
+  /** plain-text body. Legacy + fallback; `bodyHtml` wins when present. */
   body: string;
+  /** rich-text body (sanitised HTML: b/i/u/ul/ol/li/br/p/span-align). */
+  bodyHtml?: string;
   image?: ImageRef;
+  /** font key from FONT_OPTIONS in src/lib/fonts.ts. undefined = "noto" */
+  fontFamily?: string;
   /** headline scale multiplier, 1 = default */
   headlineScale?: number;
   /** fixed block height in mm; body text clips at this, doesn't push page. undefined = 90mm */

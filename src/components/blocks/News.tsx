@@ -1,10 +1,12 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import type { CSSProperties } from "react";
 import type { NewsBlock } from "@/lib/types";
 import type { BlockDef, BlockRenderProps } from "@/components/blocks/registry";
 import { newId } from "@/lib/ids";
 import { usePrintContext } from "@/components/editor/printContext";
+import { fontStack } from "@/lib/fonts";
+import { bodyToHtml, htmlToText, sanitizeHtml } from "@/lib/richText";
 
 const MM_TO_PX = 96 / 25.4; // ponytail: same conversion as PageCanvas.tsx, not exported there
 
@@ -29,6 +31,9 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
   const image = block.image;
   const imgFloat = image?.float ?? "left";
   const wrapping = imgFloat === "left" || imgFloat === "right";
+  // Non-wrapping photos span every text column, so they can sit anywhere across
+  // the article box. Legacy blocks stored that as float:"center" with no align.
+  const imgAlign = image?.align ?? (imgFloat === "center" ? "center" : "left");
   const blockHeightMm = block.heightMm ?? 90;
   // image.heightMm can outlive a block resize (dragged before heightMm shrank the
   // box) -- clamp so `cover` never zooms into a crop taller than what's shown.
@@ -90,7 +95,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
 
 
   return (
-    <div style={{ width: "100%" }}>
+    <div style={{ width: "100%", fontFamily: fontStack(block.fontFamily) }}>
       <div
         style={{ position: "relative", display: "flex", flexDirection: "column", height: `${block.heightMm ?? 90}mm`, overflow: "hidden", contain: "paint" }}
         onClick={(e) => {
@@ -164,10 +169,25 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
               style={{
                 position: "relative",
                 width: `${initialWidthPct}%`,
-                float: imgFloat === "left" ? "left" : imgFloat === "right" ? "right" : "none",
-                columnSpan: imgFloat === "full" ? "all" : "none",
-                marginRight: imgFloat === "left" ? "3mm" : imgFloat === "center" ? "auto" : undefined,
-                marginLeft: imgFloat === "right" ? "3mm" : imgFloat === "center" ? "auto" : undefined,
+                float: wrapping ? imgFloat : "none",
+                columnSpan: wrapping ? "none" : "all",
+                // Wrapping photos only need a gutter on the text side. Spanning ones
+                // are positioned by auto margins: left = 0/auto, centre = auto/auto,
+                // right = auto/0.
+                marginLeft: wrapping
+                  ? imgFloat === "right"
+                    ? "3mm"
+                    : undefined
+                  : imgAlign === "left"
+                    ? 0
+                    : "auto",
+                marginRight: wrapping
+                  ? imgFloat === "left"
+                    ? "3mm"
+                    : undefined
+                  : imgAlign === "right"
+                    ? 0
+                    : "auto",
                 marginBottom: 0,
                 breakInside: "avoid",
                 pageBreakInside: "avoid",
@@ -237,15 +257,6 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
                     >
                       बाएँ
                     </button>
-                    {block.columns === 3 && (
-                      <button
-                        type="button"
-                        className={`rounded px-1 text-xs shadow ${imgFloat === "center" ? "bg-blue-200" : "bg-white"}`}
-                        onClick={() => onChange({ ...block, image: { ...image, float: "center" } })}
-                      >
-                        बीच
-                      </button>
-                    )}
                     <button
                       type="button"
                       className={`rounded px-1 text-xs shadow ${imgFloat === "right" ? "bg-blue-200" : "bg-white"}`}
@@ -255,11 +266,27 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
                     </button>
                     <button
                       type="button"
-                      className={`rounded px-1 text-xs shadow ${imgFloat === "full" ? "bg-blue-200" : "bg-white"}`}
+                      className={`rounded px-1 text-xs shadow ${!wrapping ? "bg-blue-200" : "bg-white"}`}
                       onClick={() => onChange({ ...block, image: { ...image, float: "full" } })}
                     >
                       पूरा
                     </button>
+                    {!wrapping && (
+                      <>
+                        <span className="px-1 text-xs text-gray-500">◦</span>
+                        {(["left", "center", "right"] as const).map((a) => (
+                          <button
+                            key={a}
+                            type="button"
+                            title={a === "left" ? "बाएँ किनारे" : a === "center" ? "बीच में" : "दाएँ किनारे"}
+                            className={`rounded px-1 text-xs shadow ${imgAlign === a ? "bg-blue-200" : "bg-white"}`}
+                            onClick={() => onChange({ ...block, image: { ...image, float: "full", align: a } })}
+                          >
+                            {a === "left" ? "◧" : a === "center" ? "▣" : "◨"}
+                          </button>
+                        ))}
+                      </>
+                    )}
                     <button
                       type="button"
                       className="rounded bg-white px-1 text-xs shadow"
@@ -322,14 +349,19 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
             </div>
           )}
 
+          {/* Rich text: the caret lives in the DOM, so we hand React a static
+              __html and only read it back on blur -- re-rendering mid-keystroke
+              would collapse the selection. TextPanel drives the formatting. */}
           <div
             ref={bodyRef}
             contentEditable={editing}
             suppressContentEditableWarning
-            onBlur={(e) =>
-              editing && onChange({ ...block, body: e.currentTarget.textContent ?? "" })
-            }
-            className="empty:before:content-['यहाँ_टेक्स्ट_लिखें...'] empty:before:text-gray-400 focus:outline-none"
+            onBlur={(e) => {
+              if (!editing) return;
+              const html = sanitizeHtml(e.currentTarget.innerHTML);
+              onChange({ ...block, bodyHtml: html, body: htmlToText(html) });
+            }}
+            className="news-body empty:before:content-['यहाँ_टेक्स्ट_लिखें...'] empty:before:text-gray-400 focus:outline-none"
             style={{
               minHeight: "2em",
               hyphens: "none",
@@ -337,9 +369,8 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
               lineHeight: 1.4,
               textAlign: "left",
             }}
-          >
-            {block.body}
-          </div>
+            dangerouslySetInnerHTML={{ __html: bodyToHtml(block) }}
+          />
         </div>
 
         {editing && (

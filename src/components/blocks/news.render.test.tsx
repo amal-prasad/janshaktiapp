@@ -88,3 +88,68 @@ test("News.Render with image: editing mode has no input/select/textarea, caption
   assert.ok(editingHtml.includes(CAPTION), "editing markup missing caption");
   assert.ok(printHtml.includes(CAPTION), "print markup missing caption");
 });
+
+test("News.Render: rich bodyHtml survives to print, and is sanitised on the way", async () => {
+  const Render = await loadRender();
+  const block: NewsBlock = {
+    ...baseBlock(),
+    bodyHtml: '<ul><li>एक</li><li>दो</li></ul><p><b>मोटा</b></p><script>alert(1)</script>',
+  };
+
+  const printHtml = renderToStaticMarkup(
+    <Render block={block} editing={false} onChange={() => {}} />
+  );
+
+  // Bullets and bold reach the PDF...
+  assert.match(printHtml, /<ul>/, "print markup lost the bullet list");
+  assert.match(printHtml, /<li>एक<\/li>/, "print markup lost a list item");
+  assert.match(printHtml, /<b>मोटा<\/b>/, "print markup lost bold");
+  // ...the script never does.
+  assert.doesNotMatch(printHtml, /alert\(1\)/, "script contents leaked into print markup");
+
+  // bodyHtml wins over the legacy plain-text body.
+  assert.doesNotMatch(printHtml, new RegExp(BODY), "plain body rendered despite bodyHtml");
+});
+
+test("News.Render: non-wrapping image aligns left/centre/right via auto margins", async () => {
+  const Render = await loadRender();
+  const image: ImageRef = {
+    url: "data:image/svg+xml;utf8,test",
+    storagePath: "test/path.svg",
+    naturalW: 800,
+    naturalH: 600,
+    focalX: 0.5,
+    focalY: 0.5,
+    float: "full",
+  };
+  const render = (align: ImageRef["align"]) =>
+    renderToStaticMarkup(
+      <Render
+        block={{ ...baseBlock(), image: { ...image, align } }}
+        editing={false}
+        onChange={() => {}}
+      />
+    );
+
+  // left = flush left, centre = both auto, right = flush right.
+  assert.match(render("left"), /margin-left:0[;"]/, "left-aligned photo should have no left margin");
+  assert.match(render("left"), /margin-right:auto/, "left-aligned photo needs auto right margin");
+
+  const centre = render("center");
+  assert.match(centre, /margin-left:auto/, "centred photo needs auto left margin");
+  assert.match(centre, /margin-right:auto/, "centred photo needs auto right margin");
+
+  assert.match(render("right"), /margin-left:auto/, "right-aligned photo needs auto left margin");
+  assert.match(render("right"), /margin-right:0[;"]/, "right-aligned photo should have no right margin");
+
+  // A wrapping photo keeps its text gutter instead of auto margins.
+  const wrapped = renderToStaticMarkup(
+    <Render
+      block={{ ...baseBlock(), image: { ...image, float: "left" } }}
+      editing={false}
+      onChange={() => {}}
+    />
+  );
+  assert.match(wrapped, /float:left/, "wrapping photo lost its float");
+  assert.match(wrapped, /margin-right:3mm/, "wrapping photo lost its text gutter");
+});
