@@ -53,9 +53,9 @@ const JanshaktiLegal = ({ fields, color }: SlotRenderProps) => {
     <div
       style={{
         width: "100%",
-        fontFamily: "serif",
+        fontFamily: "var(--font-hi)",
         color: "#111",
-        borderTop: `0.6pt solid ${color}`,
+        borderTop: `1pt solid ${color}`,
         padding: "0.8mm 1mm",
         textAlign: "center",
         fontSize: "0.68em",
