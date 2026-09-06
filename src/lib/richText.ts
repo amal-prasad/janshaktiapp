@@ -4,6 +4,13 @@
 // sanitizeHtml is a TRUST BOUNDARY: allowlist-only, string/regex based (no
 // DOMParser) so it works identically on the server.
 
+import { FONT_OPTIONS } from "./fonts";
+
+// Case/whitespace-insensitive: browsers may reformat quotes around font names.
+const ALLOWED_FONT_FAMILIES = new Set(
+  FONT_OPTIONS.map((f) => f.css.trim().toLowerCase()),
+);
+
 const ALLOWED_TAGS = new Set([
   "b", "strong", "i", "em", "u", "s", "sup", "sub", "br",
   "p", "div", "span", "ul", "ol", "li", "h3", "h4", "blockquote",
@@ -53,6 +60,8 @@ function sanitizeStyle(styleValue: string): string {
       kept.push(`font-style: ${value}`);
     } else if (prop === "text-decoration" && /^(underline|line-through|none)$/.test(value)) {
       kept.push(`text-decoration: ${value}`);
+    } else if (prop === "font-family" && ALLOWED_FONT_FAMILIES.has(value)) {
+      kept.push(`font-family: ${value}`);
     }
   }
   return kept.join("; ");

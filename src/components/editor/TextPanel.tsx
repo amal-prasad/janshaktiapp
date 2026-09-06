@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { FONT_OPTIONS } from "@/lib/fonts";
 
 type Props = { disabled?: boolean };
 
@@ -88,6 +89,16 @@ export default function TextPanel({ disabled }: Props) {
     </Btn>
   );
 
+  // Selection-level font: unlike run(), must leave styleWithCSS ON so fontName
+  // emits <span style="font-family:...">, then restore it OFF so the
+  // bold/italic/etc. buttons above keep emitting semantic tags (<b>, <i>...),
+  // which is what the sanitizer's ALLOWED_TAGS expects.
+  function runFont(css: string) {
+    document.execCommand("styleWithCSS", false, "true");
+    document.execCommand("fontName", false, css);
+    document.execCommand("styleWithCSS", false, "false");
+  }
+
   return (
     <div className="space-y-3 p-3">
       <div>
@@ -114,6 +125,17 @@ export default function TextPanel({ disabled }: Props) {
           {btn("justifyCenter", "मध्य")}
           {btn("justifyRight", "दाएँ")}
           {btn("justifyFull", "जस्टिफ़ाई")}
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-semibold">फ़ॉन्ट (चयनित अंश)</label>
+        <div className="mt-1 flex flex-wrap gap-1">
+          {FONT_OPTIONS.map((opt) => (
+            <Btn key={opt.key} onRun={() => runFont(opt.css)} disabled={disabled}>
+              <span style={{ fontFamily: opt.css }}>{opt.label}</span>
+            </Btn>
+          ))}
         </div>
       </div>
 

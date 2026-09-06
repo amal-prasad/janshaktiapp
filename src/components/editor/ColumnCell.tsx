@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState, type ComponentType } from "react";
+import { useMemo, useState, type ComponentType, type CSSProperties } from "react";
 import { BLOCKS } from "@/components/blocks";
 import type { BlockRenderProps } from "@/components/blocks/registry";
 import type { Block, BlockType, Column } from "@/lib/types";
@@ -21,6 +21,8 @@ type Props = {
   ops?: ColumnOps;
   selectedBlockId?: string | null;
   onSelectBlock?: (blockId: string) => void;
+  /** Extra styles from the parent row, e.g. the column-rule divider. */
+  style?: CSSProperties;
 };
 
 export default function ColumnCell({
@@ -30,6 +32,7 @@ export default function ColumnCell({
   ops,
   selectedBlockId,
   onSelectBlock,
+  style,
 }: Props) {
   const editing = !!ops;
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -51,7 +54,7 @@ export default function ColumnCell({
       className={`group/col min-h-[40px] ${
         editing && col.blocks.length === 0 ? "border border-dashed border-gray-300" : ""
       }`}
-      style={{ display: "flex", flexDirection: "column", gap: "3mm" }}
+      style={{ display: "flex", flexDirection: "column", gap: "3mm", ...style }}
     >
       {col.blocks.map((b, i) => {
         const def = BLOCKS[b.type];

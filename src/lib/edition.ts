@@ -28,7 +28,7 @@ export async function createEdition(uid: string, title: string, date: string): P
       header: emptySlot("janshakti"),
       header2: emptySlot("strip", false),
       subheader: { ...emptySlot("janshakti-strip", true), color: "#0b4a8f" },
-      footer: emptySlot("simple"),
+      footer: emptySlot("janshakti-legal"),
     },
   } satisfies Omit<EditionDoc, "id">);
   const batch = writeBatch(db);

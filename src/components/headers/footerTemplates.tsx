@@ -36,8 +36,46 @@ const DoubleRule = ({ fields, color }: SlotRenderProps) => (
   </div>
 );
 
+const legalFields = [
+  {
+    key: "legalText",
+    label: "कानूनी सूचना पाठ",
+    default:
+      "स्वामी, मुद्रक एवं प्रकाशक : नारायण माखीजा के लिए कलम बाइंडिंग एंड प्रिंटर्स, 27/01, जूनी कसेरा बाखल, चूड़ीवाला कॉम्प्लेक्स, खजुरी बाज़ार, इंदौर (म.प्र.) से मुद्रित एवं 104 रॉयल अपार्टमेंट ब्लॉक बी, 377, खातीवाला टैंक, इंदौर (म.प्र.) से प्रकाशित। RNI NO : MPHIN/26/A3434, संपादक : नारायण माखीजा, मोबाइल नं. 987254447, 9009699993 (सभी विवादों का न्याय क्षेत्र इंदौर होगा)",
+  },
+];
+
+/** Statutory publisher/printer legal line, mandatory on the last page. */
+const JanshaktiLegal = ({ fields, color }: SlotRenderProps) => {
+  const text = fields.legalText ?? "";
+  const parts = text.split(/(987254447,\s*9009699993)/);
+  return (
+    <div
+      style={{
+        width: "100%",
+        fontFamily: "serif",
+        color: "#111",
+        borderTop: `0.6pt solid ${color}`,
+        padding: "0.8mm 1mm",
+        textAlign: "center",
+        fontSize: "0.68em",
+        lineHeight: 1.35,
+      }}
+    >
+      {parts.map((part, i) =>
+        /^987254447,\s*9009699993$/.test(part) ? (
+          <span key={i} style={{ color: "#0d8a3f" }}>{part}</span>
+        ) : (
+          <span key={i}>{part}</span>
+        ),
+      )}
+    </div>
+  );
+};
+
 export const footerTemplates: SlotTemplate[] = [
   { id: "simple", slot: "footer", label: "सरल रेखा", fields, Render: Simple },
   { id: "band", slot: "footer", label: "रंगीन पट्टी", fields, Render: Band },
   { id: "double-rule", slot: "footer", label: "दोहरी रेखा", fields, Render: DoubleRule },
+  { id: "janshakti-legal", slot: "footer", label: "जनशक्ति कानूनी फुटर", fields: legalFields, Render: JanshaktiLegal },
 ];

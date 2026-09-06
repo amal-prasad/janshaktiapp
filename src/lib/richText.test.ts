@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { sanitizeHtml, htmlToText, textToHtml, bodyToHtml } from "./richText";
+import { FONT_OPTIONS } from "./fonts";
 
 test("sanitizeHtml: script tag with contents is fully removed", () => {
   const out = sanitizeHtml("<p>a</p><script>alert(1)</script><p>b</p>");
@@ -25,6 +26,18 @@ test("sanitizeHtml: text-align survives, disallowed style dropped", () => {
   assert.equal(
     sanitizeHtml('<p style="position:fixed;color:red">x</p>'),
     "<p>x</p>",
+  );
+});
+
+test("sanitizeHtml: font-family survives only for allowlisted FONT_OPTIONS values", () => {
+  const validCss = FONT_OPTIONS[0].css;
+  assert.equal(
+    sanitizeHtml(`<span style="font-family: ${validCss}">x</span>`),
+    `<span style="font-family: ${validCss.toLowerCase()}">x</span>`,
+  );
+  assert.equal(
+    sanitizeHtml('<span style="font-family: evil-injected-value">x</span>'),
+    "<span>x</span>",
   );
 });
 

@@ -18,6 +18,8 @@ type Props = {
   slots: Record<HeaderSlot, SlotConfig>;
   /** Headers only exist on the first page, matching print/[id]/page.tsx. */
   pageIndex: number;
+  /** Total pages in the edition, so the footer knows which page is last. */
+  pageCount: number;
   readOnly?: boolean;
   selectedBlockId?: string | null;
   onSelectBlock?: (blockId: string) => void;
@@ -31,6 +33,7 @@ export default function PageCanvas({
   pageSizeMm,
   slots,
   pageIndex,
+  pageCount,
   readOnly,
   selectedBlockId,
   onSelectBlock,
@@ -145,6 +148,12 @@ export default function PageCanvas({
                 onSelectBlock={onSelectBlock}
               />
             ))}
+
+            {pageIndex === pageCount - 1 && (
+              <div style={{ position: "absolute", left: "12.7mm", right: "12.7mm", bottom: "8mm" }}>
+                <SlotRender slot="footer" config={slots.footer} editing={!readOnly} onChange={(config) => setSlot(editionId, "footer", config)} />
+              </div>
+            )}
           </div>
         </div>
       </div>

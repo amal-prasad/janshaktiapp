@@ -237,6 +237,7 @@ export default function EditPage() {
                 pageSizeMm={edition.pageSizeMm}
                 slots={edition.slots}
                 pageIndex={pages.find((p) => p.id === activePageId)?.index ?? 0}
+                pageCount={pages.length}
                 readOnly={readOnly}
                 selectedBlockId={selectedBlockId}
                 onSelectBlock={setSelectedBlockId}

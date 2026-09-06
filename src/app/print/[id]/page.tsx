@@ -59,6 +59,11 @@ export default async function PrintPage({
             {page.rows.map((row) => (
               <RowView key={row.id} row={row} editionId={edition.id} pageWmm={w} />
             ))}
+            {page.index === pages.length - 1 && (
+              <div style={{ position: "absolute", left: "12.7mm", right: "12.7mm", bottom: "8mm" }}>
+                <SlotRender slot="footer" config={edition.slots.footer} />
+              </div>
+            )}
           </div>
         ))}
       </div>
