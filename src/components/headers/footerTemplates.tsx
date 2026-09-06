@@ -46,29 +46,19 @@ const legalFields = [
 ];
 
 /** Statutory publisher/printer legal line, mandatory on the last page. */
-const JanshaktiLegal = ({ fields, color }: SlotRenderProps) => {
-  const text = fields.legalText ?? "";
-  const parts = text.split(/(987254447,\s*9009699993)/);
+const JanshaktiLegal = ({ fields }: SlotRenderProps) => {
   return (
     <div
       style={{
         width: "100%",
         fontFamily: "var(--font-hi)",
         color: "#111",
-        borderTop: `1pt solid ${color}`,
-        padding: "0.8mm 1mm",
         textAlign: "center",
         fontSize: "0.68em",
         lineHeight: 1.35,
       }}
     >
-      {parts.map((part, i) =>
-        /^987254447,\s*9009699993$/.test(part) ? (
-          <span key={i} style={{ color: "#0d8a3f" }}>{part}</span>
-        ) : (
-          <span key={i}>{part}</span>
-        ),
-      )}
+      {fields.legalText}
     </div>
   );
 };
