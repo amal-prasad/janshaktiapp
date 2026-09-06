@@ -54,7 +54,7 @@ const JanshaktiLegal = ({ fields }: SlotRenderProps) => {
         fontFamily: "var(--font-hi)",
         color: "#111",
         textAlign: "center",
-        fontSize: "0.76em",
+        fontSize: "0.82em",
         lineHeight: 1.35,
       }}
     >
