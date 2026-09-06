@@ -373,38 +373,42 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           />
         </div>
 
-        {editing && (
-          <div
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              const el = e.currentTarget.parentElement;
-              const zoom = el && el.offsetHeight ? el.getBoundingClientRect().height / el.offsetHeight : 1;
-              const startHeightMm = block.heightMm ?? 90;
-              const startY = e.clientY;
-              const onMove = (ev: PointerEvent) => {
-                const dy = ev.clientY - startY;
-                const newHeightMm = Math.max(20, startHeightMm + dy / (MM_TO_PX * zoom));
-                onChange({ ...block, heightMm: newHeightMm });
-              };
-              const onUp = () => {
-                window.removeEventListener("pointermove", onMove);
-                window.removeEventListener("pointerup", onUp);
-              };
-              window.addEventListener("pointermove", onMove);
-              window.addEventListener("pointerup", onUp);
-            }}
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: "10px",
-              background: "rgba(37,99,235,0.1)",
-              cursor: "ns-resize",
-              touchAction: "none",
-            }}
-          />
-        )}
+        {/* ponytail: bar renders always (article-underline design element, wanted
+            in print too) but the drag-to-resize behavior stays editing-only. */}
+        <div
+          onPointerDown={
+            editing
+              ? (e) => {
+                  e.stopPropagation();
+                  const el = e.currentTarget.parentElement;
+                  const zoom = el && el.offsetHeight ? el.getBoundingClientRect().height / el.offsetHeight : 1;
+                  const startHeightMm = block.heightMm ?? 90;
+                  const startY = e.clientY;
+                  const onMove = (ev: PointerEvent) => {
+                    const dy = ev.clientY - startY;
+                    const newHeightMm = Math.max(20, startHeightMm + dy / (MM_TO_PX * zoom));
+                    onChange({ ...block, heightMm: newHeightMm });
+                  };
+                  const onUp = () => {
+                    window.removeEventListener("pointermove", onMove);
+                    window.removeEventListener("pointerup", onUp);
+                  };
+                  window.addEventListener("pointermove", onMove);
+                  window.addEventListener("pointerup", onUp);
+                }
+              : undefined
+          }
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: "10px",
+            background: "rgba(37,99,235,0.1)",
+            cursor: editing ? "ns-resize" : undefined,
+            touchAction: "none",
+          }}
+        />
       </div>
     </div>
   );
