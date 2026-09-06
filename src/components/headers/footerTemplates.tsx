@@ -54,7 +54,7 @@ const JanshaktiLegal = ({ fields }: SlotRenderProps) => {
         fontFamily: "var(--font-hi)",
         color: "#111",
         textAlign: "center",
-        fontSize: "0.68em",
+        fontSize: "0.76em",
         lineHeight: 1.35,
       }}
     >
@@ -64,8 +64,8 @@ const JanshaktiLegal = ({ fields }: SlotRenderProps) => {
 };
 
 export const footerTemplates: SlotTemplate[] = [
+  { id: "janshakti-legal", slot: "footer", label: "जनशक्ति कानूनी फुटर", fields: legalFields, Render: JanshaktiLegal },
   { id: "simple", slot: "footer", label: "सरल रेखा", fields, Render: Simple },
   { id: "band", slot: "footer", label: "रंगीन पट्टी", fields, Render: Band },
   { id: "double-rule", slot: "footer", label: "दोहरी रेखा", fields, Render: DoubleRule },
-  { id: "janshakti-legal", slot: "footer", label: "जनशक्ति कानूनी फुटर", fields: legalFields, Render: JanshaktiLegal },
 ];
