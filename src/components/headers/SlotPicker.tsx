@@ -9,6 +9,7 @@ import ImagePicker from "../editor/ImagePicker";
 const SLOT_TABS: { slot: HeaderSlot; label: string }[] = [
   { slot: "header", label: "हेडर" },
   { slot: "header2", label: "2nd हेडर" },
+  { slot: "footer", label: "फुटर" },
 ];
 
 export default function SlotPicker({ editionId, edition }: { editionId: string; edition: EditionDoc }) {
