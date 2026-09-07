@@ -16,7 +16,7 @@ const halant = Halant({
   subsets: ["devanagari", "latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-halant",
-  display: "swap",
+  display: "block",
 });
 
 export const metadata: Metadata = {
@@ -42,7 +42,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="bg-neutral-100 text-neutral-900">{children}</body>
+      <body className="bg-neutral-100 text-neutral-900">
+        {/* Force font download even if no blocks currently use it, so PDF render doesn't race */}
+        <div style={{ fontFamily: "var(--font-halant)", position: "absolute", width: 0, height: 0, overflow: "hidden", visibility: "hidden" }}>
+          फ़ॉन्ट प्रीलोड
+        </div>
+        {children}
+      </body>
     </html>
   );
 }
