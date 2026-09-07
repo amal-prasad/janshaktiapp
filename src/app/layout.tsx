@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_Devanagari } from "next/font/google";
+import { Noto_Sans_Devanagari, Halant } from "next/font/google";
 import "./globals.css";
 
 // One family for the whole product, per requirement. Swap to Noto_Serif_Devanagari
@@ -11,8 +11,13 @@ const noto = Noto_Sans_Devanagari({
   display: "swap",
 });
 
-// Halant is loaded via standard Google Fonts <link> tag in the layout
-// to ensure headless Chromium reliably fetches and embeds it for PDF export.
+// Halant is a static family (no variable weight axis), so weights must be listed.
+const halant = Halant({
+  subsets: ["devanagari", "latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-halant-dev",
+  display: "block",
+});
 
 export const metadata: Metadata = {
   title: "जनशक्ति उजाला — ePaper Designer",
@@ -21,11 +26,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="hi" className={`${noto.variable}`}>
+    <html lang="hi" className={`${noto.variable} ${halant.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Halant:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         {/*
           An earlier build of this app left a service worker registered on this origin.
           It kept replaying its cached (Next 14-era) chunks, which surfaced as four

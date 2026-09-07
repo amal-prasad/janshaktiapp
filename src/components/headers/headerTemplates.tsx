@@ -1,3 +1,5 @@
+"use client";
+import { useState, useEffect, useRef } from "react";
 import type { SlotTemplate, SlotRenderProps } from "./registry";
 
 const MM_TO_PX = 96 / 25.4;
@@ -15,38 +17,52 @@ function ResizableImage({
   editing?: boolean;
   onChange?: (w: string, h: string) => void;
 }) {
-  const startResize = (e: React.PointerEvent, type: "w" | "h" | "both") => {
+  // Local draft while dragging so we don't hammer Firestore on every pointermove
+  // (the editor renders from a live snapshot, so writes would round-trip per frame).
+  const [draft, setDraft] = useState<{ w: string; h: string } | null>(null);
+  // Latest draft for onUp to read: the move/up closures are built once at
+  // pointerdown, so a plain `draft` read there would be stale.
+  const draftRef = useRef<{ w: string; h: string } | null>(null);
+  useEffect(() => {
+    draftRef.current = null;
+    setDraft(null);
+  }, [widthMm, heightMm]);
+  const dw = draft?.w ?? widthMm;
+  const dh = draft?.h ?? heightMm;
+
+  const startResize = (e: React.PointerEvent, dir: "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw") => {
     if (!editing || !onChange) return;
     e.stopPropagation();
     e.preventDefault();
     const el = (e.currentTarget as HTMLElement).parentElement;
     if (!el) return;
+    draftRef.current = null; // a handle click with no drag must not re-commit a stale size
     const zoom = el.offsetWidth ? el.getBoundingClientRect().width / el.offsetWidth : 1;
 
-    const initialW = widthMm ? parseFloat(widthMm) : el.getBoundingClientRect().width / (MM_TO_PX * zoom);
-    const initialH = heightMm ? parseFloat(heightMm) : el.getBoundingClientRect().height / (MM_TO_PX * zoom);
+    const initialW = dw ? parseFloat(dw) : el.getBoundingClientRect().width / (MM_TO_PX * zoom);
+    const initialH = dh ? parseFloat(dh) : el.getBoundingClientRect().height / (MM_TO_PX * zoom);
+
+    const sx = dir.includes("e") ? 1 : dir.includes("w") ? -1 : 0;
+    const sy = dir.includes("s") ? 1 : dir.includes("n") ? -1 : 0;
 
     const startX = e.clientX;
     const startY = e.clientY;
+    const clamp = (v: number) => Math.min(200, Math.max(10, v));
 
     const onMove = (ev: PointerEvent) => {
       const dx = ev.clientX - startX;
       const dy = ev.clientY - startY;
-
-      const newW = type === "w" || type === "both"
-        ? Math.max(10, initialW + dx / (MM_TO_PX * zoom))
-        : initialW;
-
-      const newH = type === "h" || type === "both"
-        ? Math.max(10, initialH + dy / (MM_TO_PX * zoom))
-        : initialH;
-
-      onChange(newW.toFixed(1), newH.toFixed(1));
+      const newW = sx ? clamp(initialW + (sx * dx) / (MM_TO_PX * zoom)) : initialW;
+      const newH = sy ? clamp(initialH + (sy * dy) / (MM_TO_PX * zoom)) : initialH;
+      draftRef.current = { w: newW.toFixed(1), h: newH.toFixed(1) };
+      setDraft(draftRef.current);
     };
 
     const onUp = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
+      const d = draftRef.current;
+      if (d) onChange(d.w, d.h);
     };
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
@@ -57,11 +73,11 @@ function ResizableImage({
       <img
         src={src}
         style={{
-          width: widthMm ? `${widthMm}mm` : "100%",
-          height: heightMm ? `${heightMm}mm` : "auto",
+          width: dw ? `${dw}mm` : "100%",
+          height: dh ? `${dh}mm` : "auto",
           maxWidth: "100%",
-          maxHeight: heightMm ? "none" : "25mm",
-          objectFit: heightMm ? "cover" : "contain",
+          maxHeight: dh ? "none" : "25mm",
+          objectFit: dh ? "cover" : "contain",
           display: "block",
         }}
         alt=""
@@ -69,18 +85,14 @@ function ResizableImage({
       />
       {editing && (
         <>
-          <div
-            onPointerDown={(e) => startResize(e, "w")}
-            style={{ position: "absolute", right: -5, top: 0, bottom: 0, width: "10px", cursor: "ew-resize", zIndex: 10, touchAction: "none" }}
-          />
-          <div
-            onPointerDown={(e) => startResize(e, "h")}
-            style={{ position: "absolute", bottom: -5, left: 0, right: 0, height: "10px", cursor: "ns-resize", zIndex: 10, touchAction: "none" }}
-          />
-          <div
-            onPointerDown={(e) => startResize(e, "both")}
-            style={{ position: "absolute", right: -4, bottom: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nwse-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }}
-          />
+          <div onPointerDown={(e) => startResize(e, "n")} style={{ position: "absolute", top: -5, left: 0, right: 0, height: "10px", cursor: "ns-resize", zIndex: 10, touchAction: "none" }} />
+          <div onPointerDown={(e) => startResize(e, "s")} style={{ position: "absolute", bottom: -5, left: 0, right: 0, height: "10px", cursor: "ns-resize", zIndex: 10, touchAction: "none" }} />
+          <div onPointerDown={(e) => startResize(e, "w")} style={{ position: "absolute", left: -5, top: 0, bottom: 0, width: "10px", cursor: "ew-resize", zIndex: 10, touchAction: "none" }} />
+          <div onPointerDown={(e) => startResize(e, "e")} style={{ position: "absolute", right: -5, top: 0, bottom: 0, width: "10px", cursor: "ew-resize", zIndex: 10, touchAction: "none" }} />
+          <div onPointerDown={(e) => startResize(e, "nw")} style={{ position: "absolute", left: -4, top: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nwse-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }} />
+          <div onPointerDown={(e) => startResize(e, "se")} style={{ position: "absolute", right: -4, bottom: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nwse-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }} />
+          <div onPointerDown={(e) => startResize(e, "ne")} style={{ position: "absolute", right: -4, top: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nesw-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }} />
+          <div onPointerDown={(e) => startResize(e, "sw")} style={{ position: "absolute", left: -4, bottom: -4, width: "12px", height: "12px", background: "rgba(37,99,235,0.9)", cursor: "nesw-resize", zIndex: 20, borderRadius: "2px", touchAction: "none" }} />
         </>
       )}
     </div>
@@ -187,8 +199,10 @@ const janshaktiFields = [
   { key: "weeklyLabel", label: "ऊपर लेबल", default: "साप्ताहिक" },
   { key: "tagline", label: "टैगलाइन", default: "जनता की आवाज, सत्य का उजाला..." },
   { key: "leftBoxImage", label: "बायाँ बॉक्स - चित्र", default: "" },
+  { key: "leftBoxWidth", label: "बायाँ बॉक्स - चौड़ाई (mm)", default: "45" },
   { key: "leftBoxText", label: "बायाँ बॉक्स - टेक्स्ट", default: "" },
   { key: "rightBoxImage", label: "दायाँ बॉक्स - चित्र", default: "" },
+  { key: "rightBoxWidth", label: "दायाँ बॉक्स - चौड़ाई (mm)", default: "45" },
   { key: "rightBoxText", label: "दायाँ बॉक्स - टेक्स्ट", default: "" },
   { key: "year", label: "वर्ष", default: "1" },
   { key: "issue", label: "अंक", default: "1" },
@@ -209,7 +223,7 @@ const Janshakti = ({ fields, color, editing, onChange }: SlotRenderProps) => {
   return (
     <div style={{ width: "100%", fontFamily: "sans-serif", color: "#111" }}>
       <div style={{ display: "flex", alignItems: "stretch", justifyContent: "space-between", gap: "3mm", padding: "1mm 2mm" }}>
-        <div onClick={onBoxClick} style={{ flex: `0 0 ${fields.leftBoxImageWidth ?? "45"}mm`, border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <div onClick={onBoxClick} style={{ flex: `0 0 ${fields.leftBoxWidth ?? "45"}mm`, border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column", overflow: "hidden" }}>
           {fields.leftBoxImage ? (
             <ResizableImage
               src={fields.leftBoxImage}
@@ -253,7 +267,7 @@ const Janshakti = ({ fields, color, editing, onChange }: SlotRenderProps) => {
             {fields.tagline}
           </div>
         </div>
-        <div onClick={onBoxClick} style={{ flex: `0 0 ${fields.rightBoxImageWidth ?? "45"}mm`, border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <div onClick={onBoxClick} style={{ flex: `0 0 ${fields.rightBoxWidth ?? "45"}mm`, border: "0.8pt solid #333", padding: "1mm 2mm", fontSize: "0.75em", lineHeight: 1.4, textAlign: "center", display: "flex", flexDirection: "column", overflow: "hidden" }}>
           {fields.rightBoxImage ? (
             <ResizableImage
               src={fields.rightBoxImage}

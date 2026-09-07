@@ -41,6 +41,26 @@ test("sanitizeHtml: font-family survives only for allowlisted FONT_OPTIONS value
   );
 });
 
+test("sanitizeHtml: re-serialised font-family (quotes/comma spacing) normalises to canonical value", () => {
+  const halant = FONT_OPTIONS.find((f) => f.key === "halant")!.css;
+  const shreeLipi = FONT_OPTIONS.find((f) => f.key === "shreelipi")!.css;
+  // Chrome may wrap execCommand's value in quotes.
+  assert.equal(
+    sanitizeHtml(`<span style='font-family: "${halant}"'>x</span>`),
+    `<span style="font-family: ${halant}">x</span>`,
+  );
+  // Chrome may re-quote + respace a multi-value stack.
+  assert.equal(
+    sanitizeHtml(`<span style="font-family: 'Shree Lipi' , var(--font-hi)">x</span>`),
+    `<span style="font-family: ${shreeLipi}">x</span>`,
+  );
+  // Quoting/respacing must not open a hole for non-allowlisted values.
+  assert.equal(
+    sanitizeHtml(`<span style="font-family: 'evil' , injected">x</span>`),
+    "<span>x</span>",
+  );
+});
+
 test("sanitizeHtml: unknown tag unwraps, keeps children", () => {
   assert.equal(sanitizeHtml("<marquee>x</marquee>"), "x");
 });

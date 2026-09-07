@@ -6,10 +6,13 @@
 
 import { FONT_OPTIONS } from "./fonts";
 
-// Case/whitespace-insensitive: browsers may reformat quotes around font names.
-const ALLOWED_FONT_FAMILIES = new Set(
-  FONT_OPTIONS.map((f) => f.css.trim().toLowerCase()),
-);
+// Normalise browser re-serialisation (quotes added/removed, comma respacing)
+// before matching, then emit the canonical FONT_OPTIONS value instead of
+// echoing back whatever the browser wrote -- keeps this allowlist-only.
+const normFont = (v: string) =>
+  v.toLowerCase().replace(/["']/g, "").replace(/\s*,\s*/g, ",").trim();
+
+const FONT_BY_NORM = new Map(FONT_OPTIONS.map((f) => [normFont(f.css), f.css]));
 
 const ALLOWED_TAGS = new Set([
   "b", "strong", "i", "em", "u", "s", "sup", "sub", "br",
@@ -51,7 +54,8 @@ function sanitizeStyle(styleValue: string): string {
     const idx = decl.indexOf(":");
     if (idx === -1) continue;
     const prop = decl.slice(0, idx).trim().toLowerCase();
-    const value = decl.slice(idx + 1).trim().toLowerCase();
+    const rawValue = decl.slice(idx + 1).trim();
+    const value = rawValue.toLowerCase();
     if (prop === "text-align" && /^(left|right|center|justify)$/.test(value)) {
       kept.push(`text-align: ${value}`);
     } else if (prop === "font-weight" && /^(bold|normal|[1-9]00)$/.test(value)) {
@@ -60,8 +64,9 @@ function sanitizeStyle(styleValue: string): string {
       kept.push(`font-style: ${value}`);
     } else if (prop === "text-decoration" && /^(underline|line-through|none)$/.test(value)) {
       kept.push(`text-decoration: ${value}`);
-    } else if (prop === "font-family" && ALLOWED_FONT_FAMILIES.has(value)) {
-      kept.push(`font-family: ${value}`);
+    } else if (prop === "font-family") {
+      const canon = FONT_BY_NORM.get(normFont(rawValue));
+      if (canon) kept.push(`font-family: ${canon}`);
     }
   }
   return kept.join("; ");

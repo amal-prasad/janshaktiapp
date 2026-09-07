@@ -2,8 +2,8 @@
 
 :root {
   --font-hi: var(--font-noto-dev), system-ui, sans-serif;
-  --font-halant: 'Halant';
-  --font-halant-hi: var(--font-halant), Georgia, serif;
+  --font-halant: var(--font-halant-dev);
+  --font-halant-hi: var(--font-halant), var(--font-noto-dev), serif;
 }
 
 html,
