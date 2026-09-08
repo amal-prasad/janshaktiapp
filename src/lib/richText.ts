@@ -14,6 +14,10 @@ const normFont = (v: string) =>
 
 const FONT_BY_NORM = new Map(FONT_OPTIONS.map((f) => [normFont(f.css), f.css]));
 
+// Spans saved before Halant was self-hosted carry the old var() value; map them
+// onto the current canonical stack instead of dropping the declaration.
+FONT_BY_NORM.set(normFont("var(--font-halant-hi)"), FONT_OPTIONS.find((f) => f.key === "halant")!.css);
+
 const ALLOWED_TAGS = new Set([
   "b", "strong", "i", "em", "u", "s", "sup", "sub", "br",
   "p", "div", "span", "ul", "ol", "li", "h3", "h4", "blockquote",
@@ -50,7 +54,12 @@ function extractStyleAttr(attrsStr: string): string {
 /** Keep only the handful of declarations the editor toolbar can produce. */
 function sanitizeStyle(styleValue: string): string {
   const kept: string[] = [];
-  for (const decl of styleValue.split(";")) {
+  // Decode BEFORE splitting: Chrome writes font-family: Halant, "Noto Sans
+  // Devanagari", serif, and innerHTML hands that back with &quot; entities --
+  // whose trailing ';' would otherwise split the declaration mid-entity and
+  // silently drop the font. Every value below is matched against a strict
+  // allowlist afterwards, so decoding cannot smuggle anything through.
+  for (const decl of decodeEntities(styleValue).split(";")) {
     const idx = decl.indexOf(":");
     if (idx === -1) continue;
     const prop = decl.slice(0, idx).trim().toLowerCase();

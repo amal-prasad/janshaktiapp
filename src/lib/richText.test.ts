@@ -44,9 +44,10 @@ test("sanitizeHtml: font-family survives only for allowlisted FONT_OPTIONS value
 test("sanitizeHtml: re-serialised font-family (quotes/comma spacing) normalises to canonical value", () => {
   const halant = FONT_OPTIONS.find((f) => f.key === "halant")!.css;
   const shreeLipi = FONT_OPTIONS.find((f) => f.key === "shreelipi")!.css;
-  // Chrome may wrap execCommand's value in quotes.
+  // Chrome may drop quotes and respace commas when re-serialising a stack.
+  const halantRespaced = halant.replace(/'/g, "").replace(/,\s*/g, " , ");
   assert.equal(
-    sanitizeHtml(`<span style='font-family: "${halant}"'>x</span>`),
+    sanitizeHtml(`<span style="font-family: ${halantRespaced}">x</span>`),
     `<span style="font-family: ${halant}">x</span>`,
   );
   // Chrome may re-quote + respace a multi-value stack.
@@ -58,6 +59,14 @@ test("sanitizeHtml: re-serialised font-family (quotes/comma spacing) normalises 
   assert.equal(
     sanitizeHtml(`<span style="font-family: 'evil' , injected">x</span>`),
     "<span>x</span>",
+  );
+});
+
+test("sanitizeHtml: legacy pre-self-hosting halant var() value maps to current canonical css", () => {
+  const halant = FONT_OPTIONS.find((f) => f.key === "halant")!.css;
+  assert.equal(
+    sanitizeHtml('<span style="font-family: var(--font-halant-hi)">x</span>'),
+    `<span style="font-family: ${halant}">x</span>`,
   );
 });
 
@@ -99,4 +108,19 @@ test("textToHtml: escapes and preserves line breaks", () => {
 test("bodyToHtml: prefers sanitized bodyHtml, falls back to escaped body", () => {
   assert.equal(bodyToHtml({ body: "plain", bodyHtml: "<b>rich</b>" }), "<b>rich</b>");
   assert.equal(bodyToHtml({ body: "a\nb" }), "a<br>b");
+});
+
+test("sanitizeHtml: HTML-encoded quotes in font-family still match the allowlist", () => {
+  // Exactly what Chrome's innerHTML yields after execCommand('fontName') with a
+  // quoted stack -- the quotes come back as &quot; entities.
+  const halant = FONT_OPTIONS.find((f) => f.key === "halant")!.css;
+  assert.equal(
+    sanitizeHtml('<span style="font-family: Halant, &quot;Noto Sans Devanagari&quot;, serif;">x</span>'),
+    `<span style="font-family: ${halant}">x</span>`,
+  );
+  // and the entity trick must not smuggle a non-allowlisted family through
+  assert.equal(
+    sanitizeHtml('<span style="font-family: &quot;evil&quot;, fake">x</span>'),
+    "<span>x</span>",
+  );
 });

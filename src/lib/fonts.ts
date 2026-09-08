@@ -1,7 +1,10 @@
 /** Font choices offered per news block. Keys are persisted in NewsBlock.fontFamily. */
 export const FONT_OPTIONS = [
   { key: "noto", label: "नोटो सैंस (डिफ़ॉल्ट)", css: "var(--font-hi)" },
-  { key: "halant", label: "हलंत", css: "var(--font-halant-hi)" },
+  // Literal stack, not a var() -- a single undefined CSS custom property
+  // anywhere in the chain invalidates the whole font-family declaration at
+  // computed-value time, which is exactly what silently broke Halant before.
+  { key: "halant", label: "हलंत", css: "'Halant', 'Noto Sans Devanagari', serif" },
   // ponytail: Shree Lipi is a proprietary legacy Devanagari font with no Unicode
   // webfont available (old glyph-remapped encoding) -- can't bundle it via
   // next/font. Rely on the system-installed font if present, else fall back to
