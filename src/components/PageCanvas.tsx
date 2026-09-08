@@ -147,6 +147,13 @@ export default function PageCanvas({
             {pageIndex === 0 && <SlotRender slot="header2" config={slots.header2} editing={!readOnly} onChange={(config) => setSlot(editionId, "header2", config)} />}
             {pageIndex > 0 && <InnerPageHeader pageIndex={pageIndex} datePlace={slots.header?.fields?.datePlace} />}
 
+            {pageIndex === 1 && (
+              <img src="/Untitled-5.jpg" style={{ width: "100%", height: "auto", display: "block", marginTop: "2mm" }} alt="विज्ञापन" />
+            )}
+            {pageIndex === 6 && (
+              <img src="/6.jpg" style={{ width: "100%", height: "auto", display: "block", marginTop: "2mm" }} alt="विज्ञापन" />
+            )}
+
             {rows.map((row) => (
               <RowView
                 key={row.id}

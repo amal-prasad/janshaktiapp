@@ -9,7 +9,8 @@ export default function InnerPageHeader({
   const pageNum = pageIndex + 1;
 
   let headline = "";
-  if (pageNum === 3) headline = "इंदौर सिटी";
+  if (pageNum === 2 || pageNum === 7) headline = "विज्ञापन";
+  else if (pageNum === 3) headline = "इंदौर सिटी";
   else if (pageNum === 4) headline = "संपादकीय";
   else if (pageNum === 5) headline = "प्रदेश";
   else if (pageNum === 6) headline = "सप्तरंग";
