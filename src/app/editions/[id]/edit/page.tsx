@@ -43,6 +43,7 @@ export default function EditPage() {
 
   const initializedPageId = useRef<string | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingRef = useRef<{ pageId: string; rows: Row[] } | null>(null);
   const lockTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -108,6 +109,9 @@ export default function EditPage() {
   }, [activePageId, user, editionId]);
 
   // A pending autosave must not fire into an unmounted editor.
+  // NOTE: this just discards up to 800ms of edits on unmount rather than
+  // flushing them — an async write in a cleanup function is unreliable, so
+  // this is a known gap, not intentional data-loss behaviour.
   useEffect(
     () => () => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
@@ -115,16 +119,30 @@ export default function EditPage() {
     []
   );
 
+  // Writes any debounced edit right now. The print route reads Firestore
+  // server-side, so anything still sitting in the 800ms window would export stale.
+  const flushSave = async () => {
+    if (saveTimer.current) {
+      clearTimeout(saveTimer.current);
+      saveTimer.current = null;
+    }
+    const p = pendingRef.current;
+    if (!p) return;
+    pendingRef.current = null;
+    await saveRows(editionId, p.pageId, p.rows);
+    setSaveState("saved");
+  };
+
   const onRowsChange = (next: Row[]) => {
     if (readOnly) return;
     setRows(next);
-    setSaveState("saving");
-    if (saveTimer.current) clearTimeout(saveTimer.current);
     const pageId = activePageId;
-    saveTimer.current = setTimeout(async () => {
-      if (!pageId) return;
-      await saveRows(editionId, pageId, next);
-      setSaveState("saved");
+    if (!pageId) return;
+    setSaveState("saving");
+    pendingRef.current = { pageId, rows: next };
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      void flushSave();
     }, 800);
   };
 
@@ -132,7 +150,7 @@ export default function EditPage() {
     if (!user) return;
     setExporting(true);
     try {
-      const token = await user.getIdToken();
+      const [token] = await Promise.all([user.getIdToken(), flushSave()]);
       window.open(`/print/${editionId}?token=${token}`, "_blank");
     } catch (err) {
       console.error("PDF preview error:", err);

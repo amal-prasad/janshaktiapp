@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { NewsBlock, ImageRef } from "@/lib/types";
+import { FONT_OPTIONS } from "@/lib/fonts";
 
 // ponytail: News.tsx has no local `React` import (it relies on Next's automatic
 // JSX runtime at build time). Under the plain esbuild/tsx runner used for tests,
@@ -109,6 +110,27 @@ test("News.Render: rich bodyHtml survives to print, and is sanitised on the way"
 
   // bodyHtml wins over the legacy plain-text body.
   assert.doesNotMatch(printHtml, new RegExp(BODY), "plain body rendered despite bodyHtml");
+});
+
+test("News.Render: inline font span in bodyHtml survives to print", async () => {
+  const Render = await loadRender();
+  const halantCss = FONT_OPTIONS.find((f) => f.key === "halant")!.css;
+  const block: NewsBlock = {
+    ...baseBlock(),
+    // Real string Chrome emits for an inline font override (verified empirically
+    // in headless Chromium) -- note the trailing semicolon inside style.
+    bodyHtml: `<span style="font-family: ${halantCss};">हलंत</span>`,
+  };
+
+  const printHtml = renderToStaticMarkup(
+    <Render block={block} editing={false} onChange={() => {}} />
+  );
+
+  assert.match(
+    printHtml,
+    new RegExp(`font-family: ${halantCss.replace(/[()]/g, "\\$&")}`),
+    "print markup lost the inline font-family override"
+  );
 });
 
 test("News.Render: non-wrapping image aligns left/centre/right via auto margins", async () => {
