@@ -58,10 +58,10 @@ export default async function PrintPage({
             {page.index > 0 && <InnerPageHeader pageIndex={page.index} datePlace={edition.slots.header?.fields?.datePlace} />}
 
             {page.index === 1 && (
-              <img src="/Untitled-5.jpg" style={{ width: "100%", height: "auto", display: "block", marginTop: "2mm" }} alt="विज्ञापन" />
+              <img src="/6.jpg" style={{ width: "100%", height: "auto", display: "block", marginTop: "2mm" }} alt="विज्ञापन" />
             )}
             {page.index === 6 && (
-              <img src="/6.jpg" style={{ width: "100%", height: "auto", display: "block", marginTop: "2mm" }} alt="विज्ञापन" />
+              <img src="/Untitled-5.jpg" style={{ width: "100%", height: "auto", display: "block", marginTop: "2mm" }} alt="विज्ञापन" />
             )}
 
             {page.rows.map((row) => (

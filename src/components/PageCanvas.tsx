@@ -148,10 +148,10 @@ export default function PageCanvas({
             {pageIndex > 0 && <InnerPageHeader pageIndex={pageIndex} datePlace={slots.header?.fields?.datePlace} />}
 
             {pageIndex === 1 && (
-              <img src="/Untitled-5.jpg" style={{ width: "100%", height: "auto", display: "block", marginTop: "2mm" }} alt="विज्ञापन" />
+              <img src="/6.jpg" style={{ width: "100%", height: "auto", display: "block", marginTop: "2mm" }} alt="विज्ञापन" />
             )}
             {pageIndex === 6 && (
-              <img src="/6.jpg" style={{ width: "100%", height: "auto", display: "block", marginTop: "2mm" }} alt="विज्ञापन" />
+              <img src="/Untitled-5.jpg" style={{ width: "100%", height: "auto", display: "block", marginTop: "2mm" }} alt="विज्ञापन" />
             )}
 
             {rows.map((row) => (
