@@ -83,6 +83,7 @@ function sanitizeStyle(styleValue: string): string {
 
 export function sanitizeHtml(html: string): string {
   try {
+    html = html.normalize("NFC");
     let out = "";
     let lastIndex = 0;
     const removeStack: string[] = [];
@@ -148,7 +149,7 @@ function decodeEntities(s: string): string {
 }
 
 export function htmlToText(html: string): string {
-  let s = html;
+  let s = html.normalize("NFC");
   s = s.replace(/<\/(p|div|li|h3|h4)>/gi, "\n");
   s = s.replace(/<br\s*\/?>/gi, "\n");
   s = s.replace(/<[^>]*>/g, "");
@@ -158,7 +159,7 @@ export function htmlToText(html: string): string {
 }
 
 export function textToHtml(text: string): string {
-  const escaped = text
+  const escaped = text.normalize("NFC")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")

@@ -109,7 +109,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
             contentEditable={editing}
             suppressContentEditableWarning
             onBlur={(e) =>
-              editing && onChange({ ...block, subhead: e.currentTarget.textContent ?? "" })
+              editing && onChange({ ...block, subhead: (e.currentTarget.textContent ?? "").normalize("NFC") })
             }
             className="empty:before:content-['सबहेडर'] empty:before:text-gray-400 focus:outline-none"
             style={{
@@ -119,7 +119,7 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
               marginBottom: "0.5mm",
             }}
           >
-            {block.subhead}
+            {block.subhead?.normalize("NFC")}
           </div>
         )}
 
@@ -127,11 +127,11 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
           contentEditable={editing}
           suppressContentEditableWarning
           onBlur={(e) =>
-            editing && onChange({ ...block, headline: e.currentTarget.textContent ?? "" })
+            editing && onChange({ ...block, headline: (e.currentTarget.textContent ?? "").normalize("NFC") })
           }
           style={headlineStyle}
         >
-          {block.headline}
+          {block.headline?.normalize("NFC")}
         </div>
 
         {(editing || block.byline) && (
@@ -139,11 +139,11 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
             contentEditable={editing}
             suppressContentEditableWarning
             onBlur={(e) =>
-              editing && onChange({ ...block, byline: e.currentTarget.textContent ?? "" })
+              editing && onChange({ ...block, byline: (e.currentTarget.textContent ?? "").normalize("NFC") })
             }
             style={{ fontStyle: "italic", fontSize: "0.8em", marginBottom: "1mm" }}
           >
-            {block.byline}
+            {block.byline?.normalize("NFC")}
           </div>
         )}
 

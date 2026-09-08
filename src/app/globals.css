@@ -146,6 +146,11 @@
 html,
 body {
   font-family: var(--font-hi);
+  letter-spacing: 0px !important;
+  font-feature-settings: "liga" 1, "dlig" 1, "kern" 1, "calt" 1;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  hyphens: none;
 }
 
 /* Rich-text article body. Tailwind's preflight flattens lists and headings, so

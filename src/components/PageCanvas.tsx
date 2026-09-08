@@ -46,6 +46,11 @@ export default function PageCanvas({
   const pageWpx = pageSizeMm.w * MM_TO_PX;
   const pageHpx = pageSizeMm.h * MM_TO_PX;
 
+  const [fontsReady, setFontsReady] = useState(false);
+  useEffect(() => {
+    document.fonts.ready.then(() => setFontsReady(true));
+  }, []);
+
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
@@ -90,6 +95,11 @@ export default function PageCanvas({
 
   return (
     <div className="flex h-full flex-col">
+      {!fontsReady && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-gray-200/50">
+          <div className="text-gray-500">Loading fonts...</div>
+        </div>
+      )}
       <div className="flex justify-end gap-2 p-2">
         <button
           onClick={() => setZoom((z) => Math.max(0.5, z - 0.1))}

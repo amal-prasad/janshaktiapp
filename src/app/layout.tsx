@@ -6,7 +6,7 @@ import "./globals.css";
 // here if the printed body copy reads too light -- nothing else changes.
 const noto = Noto_Sans_Devanagari({
   subsets: ["devanagari", "latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-noto-dev",
   display: "swap",
 });
