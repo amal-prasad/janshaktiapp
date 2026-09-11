@@ -7,6 +7,8 @@ export type BlockRenderProps<T extends Block> = {
   /** false in the print route and in read-only (locked) pages */
   editing: boolean;
   onChange: (next: T) => void;
+  /** Resize the block's own height while keeping the row's other columns level. Optional: absent in print/read-only paths. */
+  onResizeHeight?: (heightMm: number) => void;
 };
 
 export type BlockDef<T extends Block = Block> = {

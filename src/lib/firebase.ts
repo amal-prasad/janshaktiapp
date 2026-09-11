@@ -1,7 +1,7 @@
 "use client";
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
-import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getFirestore, initializeFirestore, connectFirestoreEmulator, type Firestore } from "firebase/firestore";
 import { getStorage, connectStorageEmulator } from "firebase/storage";
 
 const config = {
@@ -16,7 +16,17 @@ const config = {
 const app: FirebaseApp = getApps()[0] ?? initializeApp(config);
 
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Undefined optional fields (e.g. block heightMm cleared by the user) must not
+// throw "Unsupported field value: undefined" and silently abort saveRows.
+// initializeFirestore must win the race to create the instance, so guard
+// against HMR re-executing this module and calling it twice on the same app.
+let db: Firestore;
+try {
+  db = initializeFirestore(app, { ignoreUndefinedProperties: true });
+} catch {
+  db = getFirestore(app);
+}
+export { db };
 export const storage = getStorage(app);
 
 // Local run against the Firebase Emulator Suite: no real project, no billing, no

@@ -10,7 +10,7 @@ import { bodyToHtml, htmlToText, sanitizeHtml } from "@/lib/richText";
 
 const MM_TO_PX = 96 / 25.4; // ponytail: same conversion as PageCanvas.tsx, not exported there
 
-function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
+function Render({ block, editing, onChange, onResizeHeight }: BlockRenderProps<NewsBlock>) {
   const { placedMm } = usePrintContext();
   const figureRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -387,7 +387,8 @@ function Render({ block, editing, onChange }: BlockRenderProps<NewsBlock>) {
                   const onMove = (ev: PointerEvent) => {
                     const dy = ev.clientY - startY;
                     const newHeightMm = Math.max(20, startHeightMm + dy / (MM_TO_PX * zoom));
-                    onChange({ ...block, heightMm: newHeightMm });
+                    if (onResizeHeight) onResizeHeight(newHeightMm);
+                    else onChange({ ...block, heightMm: newHeightMm });
                   };
                   const onUp = () => {
                     window.removeEventListener("pointermove", onMove);

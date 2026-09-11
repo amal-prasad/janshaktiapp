@@ -2,7 +2,7 @@
 import type { AdBlock } from "@/lib/types";
 import type { BlockDef, BlockRenderProps } from "@/components/blocks/registry";
 import { newId } from "@/lib/ids";
-function Render({ block, editing, onChange }: BlockRenderProps<AdBlock>) {
+function Render({ block, editing, onChange, onResizeHeight }: BlockRenderProps<AdBlock>) {
   // The ad renders identically while editing and while printing (no in-flow
   // controls), so the canvas is WYSIWYG. Editing-only controls live in the
   // separate Article Panel now.
@@ -32,7 +32,8 @@ function Render({ block, editing, onChange }: BlockRenderProps<AdBlock>) {
             const onMove = (ev: PointerEvent) => {
               const dy = ev.clientY - startY;
               const newHeightMm = Math.max(10, startHeightMm + dy / (MM_TO_PX * zoom));
-              onChange({ ...block, heightMm: newHeightMm });
+              if (onResizeHeight) onResizeHeight(newHeightMm);
+              else onChange({ ...block, heightMm: newHeightMm });
             };
             const onUp = () => {
               window.removeEventListener("pointermove", onMove);
@@ -81,7 +82,8 @@ function Render({ block, editing, onChange }: BlockRenderProps<AdBlock>) {
             const onMove = (ev: PointerEvent) => {
               const dy = ev.clientY - startY;
               const newHeightMm = Math.max(10, startHeightMm + dy / (MM_TO_PX * zoom));
-              onChange({ ...block, heightMm: newHeightMm });
+              if (onResizeHeight) onResizeHeight(newHeightMm);
+              else onChange({ ...block, heightMm: newHeightMm });
             };
             const onUp = () => {
               window.removeEventListener("pointermove", onMove);

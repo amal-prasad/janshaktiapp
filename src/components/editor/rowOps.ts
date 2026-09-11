@@ -72,6 +72,69 @@ export function findBlockLocation(
   return null;
 }
 
+// Effective mm height news/ad blocks render at; null for auto-height (heightMm
+// undefined on an ad) or block types with no heightMm field at all.
+function effectiveHeightMm(block: Block): number | null {
+  if (block.type === "news") return block.heightMm ?? 90;
+  if (block.type === "ad") return block.heightMm ?? null;
+  return null;
+}
+
+function minHeightMm(block: Block): number {
+  return block.type === "ad" ? 10 : 20;
+}
+
+function withHeight(block: Block, heightMm: number): Block {
+  if (block.type !== "news" && block.type !== "ad") return block;
+  return { ...block, heightMm: Math.max(minHeightMm(block), heightMm) };
+}
+
+/**
+ * Resizing one block's bottom edge should keep the row level: every other
+ * column's block at the same index shifts by the same delta, so the whole
+ * horizontal band moves together instead of only the dragged column.
+ */
+export function setBlockHeight(
+  rows: Row[],
+  rowId: string,
+  colId: string,
+  blockId: string,
+  heightMm: number,
+): Row[] {
+  const row = rows.find((r) => r.id === rowId);
+  const col = row?.cols.find((c) => c.id === colId);
+  const idx = col ? col.blocks.findIndex((b) => b.id === blockId) : -1;
+  if (!row || !col || idx < 0) return rows;
+
+  const currentEffective = effectiveHeightMm(col.blocks[idx]);
+  // ponytail: target has no known baseline (auto-height ad, or a type with no
+  // heightMm) -- resize the target only, siblings can't be shifted by an
+  // unknown delta.
+  const delta = currentEffective === null ? null : heightMm - currentEffective;
+
+  return rows.map((r) =>
+    r.id !== rowId
+      ? r
+      : {
+          ...r,
+          cols: r.cols.map((c) => ({
+            ...c,
+            blocks: c.blocks.map((b, i) => {
+              if (i !== idx) return b;
+              if (c.id === colId) return withHeight(b, heightMm);
+              if (delta === null) return b;
+              const eff = effectiveHeightMm(b);
+              // ponytail: sibling is auto-height (ad with heightMm undefined)
+              // or a type with no heightMm field -- skip it, no mm value to
+              // shift; would need measurement to support.
+              if (eff === null) return b;
+              return withHeight(b, eff + delta);
+            }),
+          })),
+        },
+  );
+}
+
 export function moveBlock(
   rows: Row[],
   rowId: string,

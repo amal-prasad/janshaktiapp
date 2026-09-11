@@ -36,7 +36,7 @@ export default function EditPage() {
   const [activePageId, setActivePageId] = useState<string | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
-  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle");
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [activeTab, setActiveTab] = useState<Tab | null>(null);
   const [exporting, setExporting] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
@@ -62,12 +62,21 @@ export default function EditPage() {
   // Load the active page's rows into local editing state once, on switch.
   useEffect(() => {
     if (!activePageId || initializedPageId.current === activePageId) return;
+    // A debounced save for the page being left behind must land before we
+    // overwrite local state with the new page's (possibly stale) snapshot —
+    // otherwise the next edit on the new page re-saves over the old page's
+    // still-pending edit forever.
+    const pending = pendingRef.current;
+    if (pending && pending.pageId !== activePageId) {
+      void flushSave();
+    }
     const p = pages.find((pg) => pg.id === activePageId);
     if (p) {
       setRows(p.rows);
       initializedPageId.current = activePageId;
       setSelectedBlockId(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePageId, pages]);
 
   // Acquire the lock on entry/page switch, heartbeat while held & visible, retry while blocked.
@@ -108,33 +117,53 @@ export default function EditPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePageId, user, editionId]);
 
-  // A pending autosave must not fire into an unmounted editor.
-  // NOTE: this just discards up to 800ms of edits on unmount rather than
-  // flushing them — an async write in a cleanup function is unreliable, so
-  // this is a known gap, not intentional data-loss behaviour.
-  useEffect(
-    () => () => {
-      if (saveTimer.current) clearTimeout(saveTimer.current);
-    },
-    []
-  );
-
   // Writes any debounced edit right now. The print route reads Firestore
   // server-side, so anything still sitting in the 800ms window would export stale.
-  const flushSave = async () => {
+  // Returns whether the save (or no-op) succeeded, so callers that need to know
+  // (Save button, PDF export) can react instead of it vanishing silently.
+  const flushSave = async (): Promise<boolean> => {
     if (saveTimer.current) {
       clearTimeout(saveTimer.current);
       saveTimer.current = null;
     }
     const p = pendingRef.current;
-    if (!p) return;
-    pendingRef.current = null;
-    await saveRows(editionId, p.pageId, p.rows);
-    setSaveState("saved");
+    if (!p) return true;
+    setSaveState("saving");
+    try {
+      await saveRows(editionId, p.pageId, p.rows);
+      pendingRef.current = null;
+      setSaveState("saved");
+      return true;
+    } catch (err) {
+      // Keep pendingRef populated (do NOT null it here) so the next edit or a
+      // Save-button press retries this payload instead of dropping it.
+      console.error("Save failed:", err);
+      setSaveState("error");
+      return false;
+    }
   };
 
+  // Best-effort: an async write in beforeunload/pagehide isn't guaranteed to
+  // finish before the tab closes, but it beats discarding the edit outright.
+  useEffect(() => {
+    const flushNow = () => {
+      if (pendingRef.current) void flushSave();
+    };
+    window.addEventListener("beforeunload", flushNow);
+    window.addEventListener("pagehide", flushNow);
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      window.removeEventListener("beforeunload", flushNow);
+      window.removeEventListener("pagehide", flushNow);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const onRowsChange = (next: Row[]) => {
-    if (readOnly) return;
+    if (readOnly) {
+      console.warn("onRowsChange ignored: page is locked read-only");
+      return;
+    }
     setRows(next);
     const pageId = activePageId;
     if (!pageId) return;
@@ -150,7 +179,8 @@ export default function EditPage() {
     if (!user) return;
     setExporting(true);
     try {
-      const [token] = await Promise.all([user.getIdToken(), flushSave()]);
+      const [token, saved] = await Promise.all([user.getIdToken(), flushSave()]);
+      if (!saved) throw new Error("pending save failed before PDF export");
       window.open(`/print/${editionId}?token=${token}`, "_blank");
     } catch (err) {
       console.error("PDF preview error:", err);
@@ -158,6 +188,16 @@ export default function EditPage() {
     } finally {
       setExporting(false);
     }
+  };
+
+  const handleSave = async () => {
+    if (readOnly || !activePageId) return;
+    // Nothing debounced (e.g. no edits since the last autosave)? Force-write
+    // the current rows anyway so the button always does a real save on demand.
+    if (!pendingRef.current) {
+      pendingRef.current = { pageId: activePageId, rows };
+    }
+    await flushSave();
   };
 
   const lockHolder = readOnly
@@ -216,9 +256,22 @@ export default function EditPage() {
             <h1 className="text-sm font-semibold">{edition?.title ?? "..."}</h1>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-400">
-              {saveState === "saving" ? "सहेज रहे हैं…" : saveState === "saved" ? "सहेजा गया" : ""}
+            <span className={`text-xs ${saveState === "error" ? "text-red-600" : "text-gray-400"}`}>
+              {saveState === "saving"
+                ? "सहेज रहे हैं…"
+                : saveState === "saved"
+                  ? "सहेजा गया"
+                  : saveState === "error"
+                    ? "सहेजने में विफल"
+                    : ""}
             </span>
+            <button
+              onClick={handleSave}
+              disabled={readOnly || !activePageId || saveState === "saving"}
+              className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-800 disabled:opacity-50"
+            >
+              {saveState === "saving" ? "..." : "सहेजें"}
+            </button>
             <button
               onClick={exportPdf}
               disabled={exporting}

@@ -7,6 +7,7 @@ export type RowOps = {
   onUpdateBlock: (colId: string, blockId: string, next: Block) => void;
   onRemoveBlock: (colId: string, blockId: string) => void;
   onMoveBlock: (colId: string, blockId: string, dir: "up" | "down") => void;
+  onResizeHeight?: (colId: string, blockId: string, heightMm: number) => void;
 };
 
 type Props = {
@@ -49,6 +50,9 @@ export default function RowView({ row, editionId, pageWmm, ops, selectedBlockId,
               onUpdateBlock: (blockId, next) => ops.onUpdateBlock(col.id, blockId, next),
               onRemoveBlock: (blockId) => ops.onRemoveBlock(col.id, blockId),
               onMoveBlock: (blockId, dir) => ops.onMoveBlock(col.id, blockId, dir),
+              onResizeHeight: ops.onResizeHeight
+                ? (blockId, heightMm) => ops.onResizeHeight!(col.id, blockId, heightMm)
+                : undefined,
             }
           }
           selectedBlockId={selectedBlockId}

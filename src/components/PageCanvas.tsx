@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import RowView, { type RowOps } from "@/components/RowView";
 import SlotRender from "@/components/headers/SlotRender";
 import InnerPageHeader from "@/components/headers/InnerPageHeader";
-import { addBlock, moveBlock, removeBlock, updateBlock } from "@/components/editor/rowOps";
+import { addBlock, moveBlock, removeBlock, setBlockHeight, updateBlock } from "@/components/editor/rowOps";
 import { setSlot } from "@/lib/edition";
 import type { HeaderSlot, PageSizeMm, Row, SlotConfig } from "@/lib/types";
 
@@ -91,6 +91,8 @@ export default function PageCanvas({
     onUpdateBlock: (colId, blockId, next) => onRowsChange(updateBlock(rows, rowId, colId, blockId, next)),
     onRemoveBlock: (colId, blockId) => onRowsChange(removeBlock(rows, rowId, colId, blockId)),
     onMoveBlock: (colId, blockId, dir) => onRowsChange(moveBlock(rows, rowId, colId, blockId, dir)),
+    onResizeHeight: (colId, blockId, heightMm) =>
+      onRowsChange(setBlockHeight(rows, rowId, colId, blockId, heightMm)),
   });
 
   return (

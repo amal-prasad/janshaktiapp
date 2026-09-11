@@ -12,6 +12,7 @@ type ColumnOps = {
   onUpdateBlock: (blockId: string, next: Block) => void;
   onRemoveBlock: (blockId: string) => void;
   onMoveBlock: (blockId: string, dir: "up" | "down") => void;
+  onResizeHeight?: (blockId: string, heightMm: number) => void;
 };
 
 type Props = {
@@ -98,6 +99,7 @@ export default function ColumnCell({
               block={b}
               editing={editing}
               onChange={ops ? (next: Block) => ops.onUpdateBlock(b.id, next) : () => {}}
+              onResizeHeight={ops?.onResizeHeight ? (heightMm: number) => ops.onResizeHeight!(b.id, heightMm) : undefined}
             />
           </div>
         );
