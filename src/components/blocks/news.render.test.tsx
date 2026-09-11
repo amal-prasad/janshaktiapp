@@ -175,3 +175,57 @@ test("News.Render: non-wrapping image aligns left/centre/right via auto margins"
   assert.match(wrapped, /float:left/, "wrapping photo lost its float");
   assert.match(wrapped, /margin-right:3mm/, "wrapping photo lost its text gutter");
 });
+
+test("News.Render: multiple photos, and float:'top' ones share the full-width strip", async () => {
+  const Render = await loadRender();
+  const photo = (storagePath: string, float: ImageRef["float"]): ImageRef => ({
+    url: `data:image/svg+xml;utf8,${storagePath}`,
+    storagePath,
+    naturalW: 800,
+    naturalH: 600,
+    focalX: 0.5,
+    focalY: 0.5,
+    float,
+    caption: `कैप्शन ${storagePath}`,
+  });
+
+  const block: NewsBlock = {
+    ...baseBlock(),
+    images: [photo("a", "top"), photo("b", "top"), photo("c", "top"), photo("d", "right")],
+  };
+
+  const html = renderToStaticMarkup(<Render block={block} editing={false} onChange={() => {}} />);
+
+  // All four photos rendered.
+  for (const p of ["a", "b", "c", "d"]) {
+    assert.ok(html.includes(`utf8,${p}`), `markup missing photo ${p}`);
+  }
+  // The three strip photos flex-share one column-spanning row, so the body text
+  // resumes at full width below them instead of leaving a gutter.
+  assert.match(html, /column-span:all;display:flex/, "strip row missing");
+  assert.equal(
+    (html.match(/flex:100 1 0/g) ?? []).length,
+    3,
+    "each strip photo should take an equal flex share of the row"
+  );
+  // The non-strip photo still floats and wraps.
+  assert.match(html, /float:right/, "flow photo lost its float");
+});
+
+test("News.Render: legacy single `image` still renders when `images` is absent", async () => {
+  const Render = await loadRender();
+  const block: NewsBlock = {
+    ...baseBlock(),
+    image: {
+      url: "data:image/svg+xml;utf8,legacy",
+      storagePath: "legacy",
+      naturalW: 800,
+      naturalH: 600,
+      focalX: 0.5,
+      focalY: 0.5,
+    },
+  };
+  const html = renderToStaticMarkup(<Render block={block} editing={false} onChange={() => {}} />);
+  assert.ok(html.includes("utf8,legacy"), "legacy image field no longer renders");
+  assert.match(html, /float:left/, "legacy image lost its default left wrap");
+});

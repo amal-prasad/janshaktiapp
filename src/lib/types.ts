@@ -33,8 +33,11 @@ export type ImageRef = {
   widthPct?: number;
   /** fixed placed height in mm. undefined = auto from the source aspect ratio */
   heightMm?: number;
-  /** how body text sits against the photo. undefined = "full" (photo above, no wrap) */
-  float?: "left" | "right" | "full" | "center";
+  /** how body text sits against the photo. undefined = "full" (photo above, no wrap).
+   *  "top" = shares the full-width strip above the body with its "top" siblings,
+   *  so 2-3 photos sit side by side (left / centre / right) and the text runs
+   *  underneath at full width instead of leaving a gap beside one photo. */
+  float?: "left" | "right" | "full" | "center" | "top";
   /** horizontal placement inside the article box when the photo does not wrap
    *  (float "full"). undefined = "center" */
   align?: "left" | "center" | "right";
@@ -51,7 +54,10 @@ export type NewsBlock = Base & {
   body: string;
   /** rich-text body (sanitised HTML: b/i/u/ul/ol/li/br/p/span-align). */
   bodyHtml?: string;
+  /** legacy single photo. `images` wins when present -- read through newsImages(). */
   image?: ImageRef;
+  /** photos in render order. For the "top" strip the order is left -> right. */
+  images?: ImageRef[];
   /** font key from FONT_OPTIONS in src/lib/fonts.ts. undefined = "noto" */
   fontFamily?: string;
   /** headline scale multiplier, 1 = default */
@@ -61,6 +67,17 @@ export type NewsBlock = Base & {
   /** number of text columns. undefined defaults to 1 or 2 based on wrapping */
   columns?: number;
 };
+
+/** Photos of a news block, legacy single `image` included. */
+export function newsImages(block: NewsBlock): ImageRef[] {
+  if (block.images) return block.images;
+  return block.image ? [block.image] : [];
+}
+
+/** Writes the photo list back, retiring the legacy single-image field. */
+export function withNewsImages(block: NewsBlock, images: ImageRef[]): NewsBlock {
+  return { ...block, images, image: undefined };
+}
 
 export type AdBlock = Base & {
   type: "ad";
