@@ -21,6 +21,15 @@ const STATE_CMDS: Cmd[] = [
   "justifyLeft", "justifyCenter", "justifyRight", "justifyFull",
 ];
 
+// em relative to the block's body size; sanitizer allows any N.NNem.
+const SIZE_OPTIONS: [string, string][] = [
+  ["छोटा", "0.85em"],
+  ["सामान्य", "1em"],
+  ["मध्यम", "1.15em"],
+  ["बड़ा", "1.35em"],
+  ["बहुत बड़ा", "1.6em"],
+];
+
 function queryState(cmd: string): boolean {
   try {
     return document.queryCommandState(cmd);
@@ -99,6 +108,25 @@ export default function TextPanel({ disabled }: Props) {
     document.execCommand("styleWithCSS", false, "false");
   }
 
+  // execCommand fontSize only takes legacy 1-7, so apply 7 as a marker and
+  // rewrite the marked spans to a relative em size (scales with the block).
+  function runSize(em: string) {
+    const root = (document.getSelection()?.anchorNode?.parentElement)?.closest<HTMLElement>("[contenteditable=true]");
+    if (!root) return;
+    document.execCommand("styleWithCSS", false, "true");
+    document.execCommand("fontSize", false, "7");
+    document.execCommand("styleWithCSS", false, "false");
+    root.querySelectorAll<HTMLElement>('span[style*="xxx-large"], font[size="7"]').forEach((el) => {
+      if (el.tagName === "FONT") {
+        const span = document.createElement("span");
+        span.append(...el.childNodes);
+        el.replaceWith(span);
+        el = span;
+      }
+      el.style.fontSize = em;
+    });
+  }
+
   return (
     <div className="space-y-3 p-3">
       <div>
@@ -134,6 +162,17 @@ export default function TextPanel({ disabled }: Props) {
           {FONT_OPTIONS.map((opt) => (
             <Btn key={opt.key} onRun={() => runFont(opt.css)} disabled={disabled}>
               <span style={{ fontFamily: opt.css }}>{opt.label}</span>
+            </Btn>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-semibold">आकार (चयनित अंश)</label>
+        <div className="mt-1 flex flex-wrap gap-1">
+          {SIZE_OPTIONS.map(([label, em]) => (
+            <Btn key={em} onRun={() => runSize(em)} disabled={disabled}>
+              {label}
             </Btn>
           ))}
         </div>

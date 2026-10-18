@@ -73,6 +73,8 @@ function sanitizeStyle(styleValue: string): string {
       kept.push(`font-style: ${value}`);
     } else if (prop === "text-decoration" && /^(underline|line-through|none)$/.test(value)) {
       kept.push(`text-decoration: ${value}`);
+    } else if (prop === "font-size" && /^\d(\.\d{1,2})?em$/.test(value)) {
+      kept.push(`font-size: ${value}`);
     } else if (prop === "font-family") {
       const canon = FONT_BY_NORM.get(normFont(rawValue));
       if (canon) kept.push(`font-family: ${canon}`);

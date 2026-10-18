@@ -124,3 +124,12 @@ test("sanitizeHtml: HTML-encoded quotes in font-family still match the allowlist
     "<span>x</span>",
   );
 });
+
+test("sanitizeHtml: font-size keeps only em values", () => {
+  assert.equal(
+    sanitizeHtml('<span style="font-size: 1.35em">x</span>'),
+    '<span style="font-size: 1.35em">x</span>',
+  );
+  assert.equal(sanitizeHtml('<span style="font-size: xxx-large">x</span>'), "<span>x</span>");
+  assert.equal(sanitizeHtml('<span style="font-size: 99px">x</span>'), "<span>x</span>");
+});
