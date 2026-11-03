@@ -10,6 +10,7 @@ export default function InnerPageHeader({
   const pageNum = pageIndex + 1;
   // ponytail: Diwali edition — diyas + greeting inside yellow strip on pages 2–7 (page 8 gets full banner).
   const festive = pageNum >= 2 && pageNum <= 7;
+  const greet = { color: "#b3151b", fontWeight: 900, fontFamily: "serif", fontSize: "1.15em", whiteSpace: "nowrap" } as const;
 
   let headline = "";
   if (pageNum === 2 || pageNum === 7) headline = "विज्ञापन";
@@ -62,16 +63,15 @@ export default function InnerPageHeader({
           )}
         </div>
         
-        <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", gap: "2mm" }}>
-          {festive && <Diya size={7} />}
+        <div style={{ flex: festive ? "0 0 auto" : 1, display: "flex", justifyContent: "center", alignItems: "center", gap: "1.5mm" }}>
+          {festive && <span style={greet}>शुभ दीपावली</span>}
+          {festive && <Diya size={9} />}
           <img src="/logo.png?v=3" alt="जनशक्ति उजाला" style={{ height: "9mm", objectFit: "contain" }} />
-          {festive && <Diya size={7} />}
+          {festive && <Diya size={9} />}
+          {festive && <span style={greet}>शुभ दीपावली</span>}
         </div>
 
-        <div style={{ flex: 1, textAlign: "right", fontSize: "1em", fontWeight: 700, lineHeight: 1.15 }}>
-          {festive && (
-            <div style={{ color: "#b3151b", fontWeight: 900, fontFamily: "serif", fontSize: "1.05em" }}>✨ शुभ दीपावली ✨</div>
-          )}
+        <div style={{ flex: 1, textAlign: "right", fontSize: "1em", fontWeight: 700 }}>
           {finalDatePlace}
         </div>
       </div>
