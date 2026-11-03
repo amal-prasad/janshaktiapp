@@ -2,7 +2,7 @@
 
 export function Diya({ size = 9 }: { size?: number }) {
   return (
-    <svg width={`${size}mm`} height={`${size}mm`} viewBox="0 0 64 64" aria-hidden="true">
+    <svg width={`${size}mm`} height={`${size}mm`} viewBox="0 4 64 54" aria-hidden="true" style={{ display: "block", flexShrink: 0 }}>
       {/* flame */}
       <path d="M32 6 C38 16 40 22 32 30 C24 22 26 16 32 6 Z" fill="#ffb300" />
       <path d="M32 13 C35 19 35 23 32 27 C29 23 29 19 32 13 Z" fill="#fff3b0" />
