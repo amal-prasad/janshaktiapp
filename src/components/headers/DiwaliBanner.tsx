@@ -1,6 +1,6 @@
 // ponytail: temporary festive strip for Diwali edition; delete this file + its 2 usages to roll back.
 
-function Diya({ size = 9 }: { size?: number }) {
+export function Diya({ size = 9 }: { size?: number }) {
   return (
     <svg width={`${size}mm`} height={`${size}mm`} viewBox="0 0 64 64" aria-hidden="true">
       {/* flame */}

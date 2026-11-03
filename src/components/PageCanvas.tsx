@@ -146,7 +146,7 @@ export default function PageCanvas({
               } as React.CSSProperties
             }
           >
-            <DiwaliBanner />
+            {(pageIndex === 0 || pageIndex === 7) && <DiwaliBanner />}
             {pageIndex === 0 && <SlotRender slot="header" config={slots.header} editing={!readOnly} onChange={(config) => setSlot(editionId, "header", config)} />}
             {pageIndex === 0 && <SlotRender slot="header2" config={slots.header2} editing={!readOnly} onChange={(config) => setSlot(editionId, "header2", config)} />}
             {pageIndex > 0 && <InnerPageHeader pageIndex={pageIndex} datePlace={slots.header?.fields?.datePlace} />}
@@ -171,7 +171,7 @@ export default function PageCanvas({
             ))}
 
             {pageIndex === pageCount - 1 && (
-              <div style={{ position: "absolute", left: "12.7mm", right: "12.7mm", bottom: "8mm" }}>
+              <div style={{ position: "absolute", left: "12.7mm", right: "12.7mm", bottom: "8mm", borderTop: "1.5pt solid #b3151b", paddingTop: "1mm" }}>
                 <SlotRender slot="footer" config={slots.footer} editing={!readOnly} onChange={(config) => setSlot(editionId, "footer", config)} />
               </div>
             )}

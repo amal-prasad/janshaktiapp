@@ -1,3 +1,4 @@
+import { Diya } from "./DiwaliBanner";
 
 export default function InnerPageHeader({
   pageIndex,
@@ -7,6 +8,8 @@ export default function InnerPageHeader({
   datePlace?: string;
 }) {
   const pageNum = pageIndex + 1;
+  // ponytail: Diwali edition — diyas + greeting inside yellow strip on pages 2–7 (page 8 gets full banner).
+  const festive = pageNum >= 2 && pageNum <= 7;
 
   let headline = "";
   if (pageNum === 2 || pageNum === 7) headline = "विज्ञापन";
@@ -59,11 +62,16 @@ export default function InnerPageHeader({
           )}
         </div>
         
-        <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+        <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center", gap: "2mm" }}>
+          {festive && <Diya size={7} />}
           <img src="/logo.png?v=3" alt="जनशक्ति उजाला" style={{ height: "9mm", objectFit: "contain" }} />
+          {festive && <Diya size={7} />}
         </div>
 
-        <div style={{ flex: 1, textAlign: "right", fontSize: "1em", fontWeight: 700 }}>
+        <div style={{ flex: 1, textAlign: "right", fontSize: "1em", fontWeight: 700, lineHeight: 1.15 }}>
+          {festive && (
+            <div style={{ color: "#b3151b", fontWeight: 900, fontFamily: "serif", fontSize: "1.05em" }}>✨ शुभ दीपावली ✨</div>
+          )}
           {finalDatePlace}
         </div>
       </div>
