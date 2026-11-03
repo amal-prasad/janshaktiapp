@@ -10,7 +10,13 @@ export default function InnerPageHeader({
   const pageNum = pageIndex + 1;
   // ponytail: Diwali edition — diyas + greeting inside yellow strip on pages 2–7 (page 8 gets full banner).
   const festive = pageNum >= 2 && pageNum <= 7;
-  const greet = { color: "#b3151b", fontWeight: 900, fontFamily: "serif", fontSize: "1.6em", lineHeight: 1, whiteSpace: "nowrap", display: "block" } as const;
+  const pill = {
+    display: "flex", alignItems: "center", gap: "1.5mm", whiteSpace: "nowrap",
+    background: "linear-gradient(180deg, #9a1b0b, #6b0a02)",
+    color: "#ffe9a8", fontWeight: 800, fontFamily: "serif", fontSize: "1.25em", lineHeight: 1,
+    padding: "0.6mm 3.5mm", borderRadius: "999px", border: "0.8pt solid #f5b301",
+    boxShadow: "0 0 1.5mm rgba(245,158,11,0.7)", textShadow: "0 0 1mm rgba(251,191,36,0.6)",
+  } as const;
 
   let headline = "";
   if (pageNum === 2 || pageNum === 7) headline = "विज्ञापन";
@@ -32,7 +38,7 @@ export default function InnerPageHeader({
         display: "flex", 
         alignItems: "center", 
         justifyContent: "space-between", 
-        padding: festive ? "0.5mm 3mm" : "1.5mm 3mm"
+        padding: festive ? "1mm 3mm" : "1.5mm 3mm"
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "4mm", flex: 1 }}>
           <div style={{ 
@@ -63,19 +69,28 @@ export default function InnerPageHeader({
           )}
         </div>
         
-        <div style={{ flex: festive ? "0 0 auto" : 1, display: "flex", justifyContent: "center", alignItems: "center", gap: "2mm" }}>
-          {festive && <span style={greet}>शुभ दीपावली</span>}
-          {festive && <Diya size={11} />}
+        <div style={{ flex: festive ? "0 0 auto" : 1, display: "flex", justifyContent: "center", alignItems: "center", gap: "3mm" }}>
+          {festive && <span style={pill}><Diya size={7.5} />शुभ दीपावली</span>}
           <img src="/logo.png?v=3" alt="जनशक्ति उजाला" style={{ height: "9mm", objectFit: "contain", display: "block" }} />
-          {festive && <Diya size={11} />}
-          {festive && <span style={greet}>शुभ दीपावली</span>}
+          {festive && <span style={pill}>शुभ दीपावली<Diya size={7.5} /></span>}
         </div>
 
         <div style={{ flex: 1, textAlign: "right", fontSize: "1em", fontWeight: 700 }}>
           {finalDatePlace}
         </div>
       </div>
-      <div style={{ borderBottom: "0.8pt solid #000", marginTop: "1mm" }} />
+      {festive ? (
+        // marigold toran: alternating orange/yellow flowers hanging under the strip
+        <div style={{
+          height: "2mm",
+          background:
+            "radial-gradient(circle at 50% 35%, #ea580c 0 0.7mm, transparent 0.75mm) 0 0 / 4mm 2mm repeat-x," +
+            "radial-gradient(circle at 50% 35%, #facc15 0 0.7mm, transparent 0.75mm) 2mm 0 / 4mm 2mm repeat-x",
+          borderBottom: "0.8pt solid #000",
+        }} />
+      ) : (
+        <div style={{ borderBottom: "0.8pt solid #000", marginTop: "1mm" }} />
+      )}
     </div>
   );
 }
