@@ -135,7 +135,7 @@ export default function PageCanvas({
         */}
         <div style={{ width: pageWpx * scale, height: pageHpx * scale, margin: "auto" }}>
           <div
-            className="page-sheet shadow-lg"
+            className={`page-sheet shadow-lg${pageIndex >= 7 ? " page-sheet-bottom-rule" : ""}`}
             style={
               {
                 "--page-w": `${pageSizeMm.w}mm`,

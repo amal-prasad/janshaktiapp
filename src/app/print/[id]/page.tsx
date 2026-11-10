@@ -50,7 +50,7 @@ export default async function PrintPage({
         {pages.map((page: PageDoc) => (
           <div
             key={page.id}
-            className="page-sheet print-sheet"
+            className={`page-sheet print-sheet${page.index >= 7 ? " page-sheet-bottom-rule" : ""}`}
             style={{ "--page-w": `${w}mm`, "--page-h": `${h}mm` } as React.CSSProperties}
           >
             {page.index === 0 && <SlotRender slot="header" config={edition.slots.header} />}

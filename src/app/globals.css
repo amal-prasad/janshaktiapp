@@ -214,7 +214,7 @@ body {
   position: relative;
 }
 
-.page-sheet::after {
+.page-sheet-bottom-rule::after {
   content: "";
   position: absolute;
   left: 12.7mm;
