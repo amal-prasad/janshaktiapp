@@ -4,7 +4,6 @@ import { loadForPrint, verifyToken } from "@/lib/admin";
 import type { PageDoc } from "@/lib/types";
 import RowView from "@/components/RowView";
 import InnerPageHeader from "@/components/headers/InnerPageHeader";
-import DiwaliBanner from "@/components/headers/DiwaliBanner";
 import AutoPrint from "@/components/AutoPrint";
 
 // Fully server-rendered: no hydration race for headless Chromium to lose.
@@ -54,7 +53,6 @@ export default async function PrintPage({
             className="page-sheet print-sheet"
             style={{ "--page-w": `${w}mm`, "--page-h": `${h}mm` } as React.CSSProperties}
           >
-            {(page.index === 0 || page.index === 7) && <DiwaliBanner />}
             {page.index === 0 && <SlotRender slot="header" config={edition.slots.header} />}
             {page.index === 0 && <SlotRender slot="header2" config={edition.slots.header2} />}
             {page.index > 0 && <InnerPageHeader pageIndex={page.index} datePlace={edition.slots.header?.fields?.datePlace} />}
@@ -70,7 +68,7 @@ export default async function PrintPage({
               <RowView key={row.id} row={row} editionId={edition.id} pageWmm={w} />
             ))}
             {page.index === pages.length - 1 && (
-              <div style={{ position: "absolute", left: "12.7mm", right: "12.7mm", bottom: "8mm", borderTop: "1.5pt solid #b3151b", paddingTop: "1mm" }}>
+              <div style={{ position: "absolute", left: "12.7mm", right: "12.7mm", bottom: "8mm" }}>
                 <SlotRender slot="footer" config={edition.slots.footer} />
               </div>
             )}
