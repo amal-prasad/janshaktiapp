@@ -135,7 +135,7 @@ export default function PageCanvas({
         */}
         <div style={{ width: pageWpx * scale, height: pageHpx * scale, margin: "auto" }}>
           <div
-            className={`page-sheet shadow-lg${pageIndex >= 7 ? " page-sheet-bottom-rule" : ""}`}
+            className="page-sheet shadow-lg page-sheet-bottom-rule" // ponytail: editor-only guide; PDF uses print route, rule there only on pages 8+
             style={
               {
                 "--page-w": `${pageSizeMm.w}mm`,
